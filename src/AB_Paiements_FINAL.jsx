@@ -163,7 +163,7 @@ export default function ABPaiements() {
         <div style={{ maxWidth: '980px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '11px' }}>
             <b style={{ fontSize: '21px' }}>AB – Paiements</b>
-            <span style={{ fontSize: '10.5px', color: '#C9A227', letterSpacing: '.12em', textTransform: 'uppercase' }}>Fournisseurs</span>
+            <span style={{ fontSize: '10.5px', color: '#D4B76A', letterSpacing: '.12em', textTransform: 'uppercase' }}>Fournisseurs</span>
           </div>
 
           {/* Onglets et actions */}
@@ -180,7 +180,7 @@ export default function ABPaiements() {
                   onClick={() => handleChangeTab(tab.id)}
                   style={{
                     border: activeTab === tab.id ? '1px solid #C9A227' : '1px solid rgba(255,255,255,.35)',
-                    background: activeTab === tab.id ? '#C9A227' : 'transparent',
+                    background: activeTab === tab.id ? '#D4B76A' : 'transparent',
                     color: activeTab === tab.id ? '#162D49' : '#fff',
                     borderRadius: '7px',
                     padding: '7px 13px',
@@ -234,12 +234,12 @@ export default function ABPaiements() {
             <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Tableau de bord</b>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '9px', marginBottom: '20px' }}>
-              <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(179,53,44,.10)" color="#B3352C" />
-              <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(185,106,0,.10)" color="#B96A00" />
+              <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(224,128,128,.15)" color="#E08080" />
+              <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
             </div>
 
             {factureBientot.length > 0 && (
-              <div style={{ background: 'rgba(201,162,39,.15)', border: '1px solid rgba(201,162,39,.3)', borderRadius: '10px', padding: '12px 15px', marginBottom: '20px' }}>
+              <div style={{ background: 'rgba(212,183,106,.15)', border: '1px solid rgba(212,183,106,.3)', borderRadius: '10px', padding: '12px 15px', marginBottom: '20px' }}>
                 <b style={{ fontSize: '13px', display: 'block', marginBottom: '8px' }}>📅 Échéances proches ({factureBientot.length})</b>
                 {factureBientot.map(f => (
                   <div key={f.id} style={{ fontSize: '12px', paddingBottom: '6px' }}>
@@ -370,17 +370,17 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
                   <td style={{ padding: '10px', fontSize: '13px', fontWeight: 600 }}>{formatMontant(f.montantTTC)}</td>
                   <td style={{ padding: '10px', fontSize: '13px' }}>{formatDate(f.dateEcheance)}</td>
                   <td style={{ padding: '10px', textAlign: 'center', fontSize: '11px' }}>
-                    {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#B3352C', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
-                    {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#B96A00', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
+                    {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#E08080', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
+                    {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#E8B66E', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
                     {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>À payer</span>}
-                    {f.statut === 'payée' && <span style={{ background: '#2E7D46', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
+                    {f.statut === 'payée' && <span style={{ background: '#7BB38F', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
                   </td>
                   <td style={{ padding: '10px', textAlign: 'center' }}>
                     {onPayer && f.statut === 'à payer' && (
-                      <button onClick={() => onPayer(f)} style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
+                      <button onClick={() => onPayer(f)} style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
                     )}
-                    <button onClick={() => onEdit(f)} style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
-                    <button onClick={() => onDelete(f.id)} style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
+                    <button onClick={() => onEdit(f)} style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
+                    <button onClick={() => onDelete(f.id)} style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
                   </td>
                 </tr>
               ))}
@@ -453,7 +453,7 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
   };
 
   return (
-    <div style={{ background: 'rgba(201,162,39,.10)', border: '1px solid rgba(201,162,39,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
+    <div style={{ background: 'rgba(212,183,106,.10)', border: '1px solid rgba(212,183,106,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
       <h4 style={{ margin: '0 0 11px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '.1em' }}>
         {facture ? 'Modifier la facture' : 'Nouvelle facture'}
       </h4>
@@ -512,7 +512,7 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
               <button
                 type="button"
                 onClick={handleAjouterNewFournisseur}
-                style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', marginRight: '8px' }}
+                style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', marginRight: '8px' }}
               >
                 Ajouter le fournisseur
               </button>
@@ -568,7 +568,7 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
         )}
 
         <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px', justifyContent: 'flex-end' }}>
-          <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
+          <button type="submit" style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
             Enregistrer
           </button>
           <button type="button" onClick={onAnnuler} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
@@ -641,7 +641,7 @@ function ModalPaiement({ facture, onConfirmer, onAnnuler }) {
             onClick={handleConfirm}
             style={{
               flex: 1,
-              background: '#2E7D46',
+              background: '#7BB38F',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
@@ -715,7 +715,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
       </div>
 
       {showForm && (
-        <div style={{ background: 'rgba(201,162,39,.10)', border: '1px solid rgba(201,162,39,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
+        <div style={{ background: 'rgba(212,183,106,.10)', border: '1px solid rgba(212,183,106,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
           <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '9px', alignItems: 'flex-end' }}>
             <input
               type="text"
@@ -732,7 +732,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }}
             />
-            <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="submit" style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
               {editingId ? 'Modifier' : 'Ajouter'}
             </button>
             <button type="button" onClick={handleCancel} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
@@ -759,13 +759,13 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
                 <td style={{ padding: '12px', textAlign: 'center' }}>
                   <button
                     onClick={() => handleEdit(f)}
-                    style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', marginRight: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', marginRight: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     ✎ Modifier
                   </button>
                   <button
                     onClick={() => onSupprimer(f.id)}
-                    style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     🗑️ Supprimer
                   </button>
