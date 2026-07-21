@@ -276,7 +276,6 @@ function FormulaireFacture({ facture, onSauvegarder, onAnnuler }) {
     fournisseur: '',
     numero: '',
     dateFacture: new Date().toISOString().split('T')[0],
-    dateEnregistrement: new Date().toISOString().split('T')[0],
     dateEcheance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     montantTTC: '',
     chantier: '',
@@ -323,11 +322,6 @@ function FormulaireFacture({ facture, onSauvegarder, onAnnuler }) {
         <div>
           <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Date facture *</label>
           <input type="date" name="dateFacture" value={formData.dateFacture} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
-        </div>
-
-        <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Date enreg. *</label>
-          <input type="date" name="dateEnregistrement" value={formData.dateEnregistrement} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
         </div>
 
         <div>
