@@ -340,6 +340,7 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
               <td style={{ padding: '10px', textAlign: 'center', fontSize: '11px' }}>
                 {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#B3352C', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
                 {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#B96A00', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
+                {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>À payer</span>}
                 {f.statut === 'payée' && <span style={{ background: '#2E7D46', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
               </td>
               <td style={{ padding: '10px', textAlign: 'center' }}>
