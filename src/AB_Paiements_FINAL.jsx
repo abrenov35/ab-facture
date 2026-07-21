@@ -146,7 +146,6 @@ export default function ABPaiements() {
 
   const totalAPayer = factures.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
   const totalEnRetard = factures.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
-  const totalTous = factures.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
   const factureBientot = factures.filter(f => estEcheanceProche(f.dateEcheance, f.statut));
 
   if (loading) {
@@ -233,7 +232,6 @@ export default function ABPaiements() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '9px', marginBottom: '20px' }}>
               <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(179,53,44,.10)" color="#B3352C" />
               <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(185,106,0,.10)" color="#B96A00" />
-              <StatCard titre="Total" montant={formatMontant(totalTous)} bg="rgba(46,125,70,.10)" color="#2E7D46" />
             </div>
 
             {factureBientot.length > 0 && (
