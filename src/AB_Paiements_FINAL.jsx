@@ -534,7 +534,7 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
           </div>
         )}
 
-        <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px' }}>
+        <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px', justifyContent: 'flex-end' }}>
           <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
             Enregistrer
           </button>
