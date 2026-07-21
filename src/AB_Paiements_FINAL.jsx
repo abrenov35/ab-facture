@@ -43,59 +43,63 @@ export default function ABPaiements() {
   }, []);
 
   const loadData = async () => {
-    const data = await gs.getFactures();
-    if (data && Array.isArray(data)) {
-      setFactures(data);
-      // Extraire les fournisseurs uniques des factures
-      const fourns = data
-        .filter(f => f.fournisseur)
-        .map(f => ({ id: Math.random().toString(36).substr(2, 9), nom: f.fournisseur, type: f.typeFournisseur || '' }));
-      const uniqueFourns = [];
-      const seen = new Set();
-      fourns.forEach(f => {
-        if (!seen.has(f.nom)) {
-          seen.add(f.nom);
-          uniqueFourns.push(f);
-        }
-      });
-      setFournisseurs(uniqueFourns);
+    // Charger depuis localStorage
+    const savedFactures = localStorage.getItem('ab_factures');
+    const savedFournisseurs = localStorage.getItem('ab_fournisseurs');
+    
+    if (savedFactures) {
+      setFactures(JSON.parse(savedFactures));
     }
+    if (savedFournisseurs) {
+      setFournisseurs(JSON.parse(savedFournisseurs));
+    }
+    
     setLoading(false);
   };
 
   const handleAjouterFournisseur = async (newFourn) => {
     if (!fournisseurs.find(f => f.nom.toLowerCase() === newFourn.nom.toLowerCase())) {
       const newFournisseur = { id: Math.random().toString(36).substr(2, 9), ...newFourn };
-      setFournisseurs([...fournisseurs, newFournisseur]);
+      const updatedFournisseurs = [...fournisseurs, newFournisseur];
+      setFournisseurs(updatedFournisseurs);
+      localStorage.setItem('ab_fournisseurs', JSON.stringify(updatedFournisseurs));
     }
   };
 
   const handleModifierFournisseur = (updatedFourn) => {
-    setFournisseurs(fournisseurs.map(f => f.id === updatedFourn.id ? updatedFourn : f));
+    const updated = fournisseurs.map(f => f.id === updatedFourn.id ? updatedFourn : f);
+    setFournisseurs(updated);
+    localStorage.setItem('ab_fournisseurs', JSON.stringify(updated));
     setEditingFournisseur(null);
   };
 
   const handleSupprimerFournisseur = (id) => {
     if (window.confirm('Supprimer ce fournisseur ?')) {
-      setFournisseurs(fournisseurs.filter(f => f.id !== id));
+      const updated = fournisseurs.filter(f => f.id !== id);
+      setFournisseurs(updated);
+      localStorage.setItem('ab_fournisseurs', JSON.stringify(updated));
     }
   };
 
   const handleSauvegarder = async (nouvelleFacture) => {
+    let updatedFactures;
     if (editingFacture) {
-      await gs.updateFacture({ ...nouvelleFacture, id: editingFacture.id });
+      updatedFactures = factures.map(f => f.id === editingFacture.id ? { ...nouvelleFacture, id: editingFacture.id } : f);
     } else {
-      await gs.addFacture(nouvelleFacture);
+      const newId = Math.random().toString(36).substr(2, 9);
+      updatedFactures = [...factures, { ...nouvelleFacture, id: newId }];
     }
-    loadData();
+    setFactures(updatedFactures);
+    localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
     setEditingFacture(null);
     setShowFormulaire(false);
   };
 
   const handleSupprimer = async (id) => {
     if (window.confirm('Êtes-vous sûr ?')) {
-      await gs.deleteFacture(id);
-      loadData();
+      const updatedFactures = factures.filter(f => f.id !== id);
+      setFactures(updatedFactures);
+      localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
     }
   };
 
