@@ -81,6 +81,12 @@ export default function ABPaiements() {
     }
   };
 
+  const handleChangeTab = (tabId) => {
+    setActiveTab(tabId);
+    setShowFormulaire(false);
+    setEditingFacture(null);
+  };
+
   const handleSauvegarder = async (nouvelleFacture) => {
     let updatedFactures;
     if (editingFacture) {
@@ -154,7 +160,7 @@ export default function ABPaiements() {
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleChangeTab(tab.id)}
                 style={{
                   border: activeTab === tab.id ? '1px solid #C9A227' : '1px solid rgba(255,255,255,.35)',
                   background: activeTab === tab.id ? '#C9A227' : 'transparent',
