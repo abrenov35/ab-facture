@@ -682,7 +682,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
 
       {showForm && (
         <div style={{ background: 'rgba(201,162,39,.10)', border: '1px solid rgba(201,162,39,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '9px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '9px', alignItems: 'flex-end' }}>
             <input
               type="text"
               placeholder="Nom du fournisseur"
@@ -698,14 +698,12 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }}
             />
-            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px' }}>
-              <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
-                {editingId ? 'Modifier' : 'Ajouter'}
-              </button>
-              <button type="button" onClick={handleCancel} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
-                Annuler
-              </button>
-            </div>
+            <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
+              {editingId ? 'Modifier' : 'Ajouter'}
+            </button>
+            <button type="button" onClick={handleCancel} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
+              Annuler
+            </button>
           </form>
         </div>
       )}
