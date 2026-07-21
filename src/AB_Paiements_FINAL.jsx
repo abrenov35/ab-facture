@@ -321,43 +321,73 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
     return <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Aucune facture</div>;
   }
 
+  // Grouper les factures par mois/année
+  const groupByMonth = () => {
+    const groups = {};
+    factures.forEach(f => {
+      const date = new Date(f.dateEcheance + 'T00:00:00Z');
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (!groups[monthKey]) {
+        groups[monthKey] = [];
+      }
+      groups[monthKey].push(f);
+    });
+    return groups;
+  };
+
+  const monthGroups = groupByMonth();
+  const sortedMonths = Object.keys(monthGroups).sort();
+
+  const getMonthLabel = (monthKey) => {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(year, parseInt(month) - 1);
+    return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  };
+
   return (
     <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ background: '#162D49', color: '#fff' }}>
-            <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Fournisseur</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>N° facture</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Montant TTC</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Échéance</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>Statut</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {factures.map((f, i) => (
-            <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
-              <td style={{ padding: '10px', fontSize: '13px' }}>{f.fournisseur}</td>
-              <td style={{ padding: '10px', fontSize: '13px' }}>{f.numero}</td>
-              <td style={{ padding: '10px', fontSize: '13px', fontWeight: 600 }}>{formatMontant(f.montantTTC)}</td>
-              <td style={{ padding: '10px', fontSize: '13px' }}>{formatDate(f.dateEcheance)}</td>
-              <td style={{ padding: '10px', textAlign: 'center', fontSize: '11px' }}>
-                {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#B3352C', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
-                {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#B96A00', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
-                {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>À payer</span>}
-                {f.statut === 'payée' && <span style={{ background: '#2E7D46', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
-              </td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>
-                {onPayer && f.statut === 'à payer' && (
-                  <button onClick={() => onPayer(f)} style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
-                )}
-                <button onClick={() => onEdit(f)} style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
-                <button onClick={() => onDelete(f.id)} style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {sortedMonths.map(monthKey => (
+        <div key={monthKey} style={{ marginBottom: '20px' }}>
+          <div style={{ background: '#162D49', color: '#fff', padding: '10px 15px', borderRadius: '8px 8px 0 0', fontSize: '14px', fontWeight: 700, textTransform: 'capitalize' }}>
+            📅 {getMonthLabel(monthKey)}
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#f0f0f0', borderBottom: '1px solid #ddd' }}>
+                <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Fournisseur</th>
+                <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>N° facture</th>
+                <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Montant TTC</th>
+                <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Échéance</th>
+                <th style={{ padding: '10px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>Statut</th>
+                <th style={{ padding: '10px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthGroups[monthKey].map((f, i) => (
+                <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
+                  <td style={{ padding: '10px', fontSize: '13px' }}>{f.fournisseur}</td>
+                  <td style={{ padding: '10px', fontSize: '13px' }}>{f.numero}</td>
+                  <td style={{ padding: '10px', fontSize: '13px', fontWeight: 600 }}>{formatMontant(f.montantTTC)}</td>
+                  <td style={{ padding: '10px', fontSize: '13px' }}>{formatDate(f.dateEcheance)}</td>
+                  <td style={{ padding: '10px', textAlign: 'center', fontSize: '11px' }}>
+                    {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#B3352C', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
+                    {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#B96A00', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
+                    {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>À payer</span>}
+                    {f.statut === 'payée' && <span style={{ background: '#2E7D46', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
+                  </td>
+                  <td style={{ padding: '10px', textAlign: 'center' }}>
+                    {onPayer && f.statut === 'à payer' && (
+                      <button onClick={() => onPayer(f)} style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
+                    )}
+                    <button onClick={() => onEdit(f)} style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
+                    <button onClick={() => onDelete(f.id)} style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
