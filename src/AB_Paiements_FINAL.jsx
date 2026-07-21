@@ -553,8 +553,6 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
     dateFacture: new Date().toISOString().split('T')[0],
     dateEnregistrement: new Date().toISOString().split('T')[0],
     dateEcheance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    montantHT: '',
-    tva: '',
     montantTTC: '',
     chantier: '',
     statut: 'à payer',
@@ -564,12 +562,6 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
-    
-    if (name === 'montantHT' || name === 'tva') {
-      const ht = parseFloat(updated.montantHT || 0);
-      const tva = parseFloat(updated.tva || 0);
-      updated.montantTTC = (ht + tva).toFixed(2);
-    }
     
     if (name === 'dateFacture') {
       const date = new Date(value);
@@ -704,54 +696,16 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>HT (€) *</label>
-          <input
-            type="number"
-            name="montantHT"
-            value={formData.montantHT}
-            onChange={handleChange}
-            required
-            step="0.01"
-            style={{
-              background: '#fff',
-              border: '1px solid rgba(22,45,73,.25)',
-              borderRadius: '7px',
-              padding: '9px 11px',
-              fontSize: '13.5px',
-              width: '100%'
-            }}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>TVA (€) *</label>
-          <input
-            type="number"
-            name="tva"
-            value={formData.tva}
-            onChange={handleChange}
-            required
-            step="0.01"
-            style={{
-              background: '#fff',
-              border: '1px solid rgba(22,45,73,.25)',
-              borderRadius: '7px',
-              padding: '9px 11px',
-              fontSize: '13.5px',
-              width: '100%'
-            }}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>TTC (€)</label>
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Montant TTC (€) *</label>
           <input
             type="number"
             name="montantTTC"
             value={formData.montantTTC}
-            disabled
+            onChange={handleChange}
+            required
+            step="0.01"
             style={{
-              background: '#FAF9F6',
+              background: '#fff',
               border: '1px solid rgba(22,45,73,.25)',
               borderRadius: '7px',
               padding: '9px 11px',
