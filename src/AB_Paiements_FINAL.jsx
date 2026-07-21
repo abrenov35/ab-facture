@@ -162,31 +162,52 @@ export default function ABPaiements() {
             <span style={{ fontSize: '10.5px', color: '#C9A227', letterSpacing: '.12em', textTransform: 'uppercase' }}>Fournisseurs</span>
           </div>
 
-          {/* Onglets */}
-          <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
-            {[
-              { id: 'dashboard', label: 'Tableau de bord' },
-              { id: 'a-payer', label: 'À payer' },
-              { id: 'payees', label: 'Payées' },
-              { id: 'fournisseurs', label: 'Fournisseurs' }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => handleChangeTab(tab.id)}
-                style={{
-                  border: activeTab === tab.id ? '1px solid #C9A227' : '1px solid rgba(255,255,255,.35)',
-                  background: activeTab === tab.id ? '#C9A227' : 'transparent',
-                  color: activeTab === tab.id ? '#162D49' : '#fff',
-                  borderRadius: '7px',
-                  padding: '7px 13px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Onglets et actions */}
+          <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'dashboard', label: 'Tableau de bord' },
+                { id: 'a-payer', label: 'À payer' },
+                { id: 'payees', label: 'Payées' },
+                { id: 'fournisseurs', label: 'Fournisseurs' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleChangeTab(tab.id)}
+                  style={{
+                    border: activeTab === tab.id ? '1px solid #C9A227' : '1px solid rgba(255,255,255,.35)',
+                    background: activeTab === tab.id ? '#C9A227' : 'transparent',
+                    color: activeTab === tab.id ? '#162D49' : '#fff',
+                    borderRadius: '7px',
+                    padding: '7px 13px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => { setShowFormulaire(true); setEditingFacture(null); }}
+              style={{
+                background: '#fff',
+                color: '#162D49',
+                border: 'none',
+                borderRadius: '7px',
+                padding: '8px 14px',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <Plus size={18} /> Nouvelle facture
+            </button>
           </div>
         </div>
       </div>
@@ -224,28 +245,13 @@ export default function ABPaiements() {
                 ))}
               </div>
             )}
-
-            <button
-              onClick={() => { setShowFormulaire(true); setEditingFacture(null); }}
-              style={{ background: '#162D49', color: '#fff', border: 'none', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', marginBottom: '12px' }}
-            >
-              <Plus size={18} style={{ marginRight: '6px', display: 'inline' }} /> Nouvelle facture
-            </button>
           </div>
         )}
 
         {/* À PAYER */}
         {activeTab === 'a-payer' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <b style={{ fontSize: '14.5px' }}>Factures à payer</b>
-              <button
-                onClick={() => { setShowFormulaire(true); setEditingFacture(null); }}
-                style={{ background: '#162D49', color: '#fff', border: 'none', borderRadius: '7px', padding: '8px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                <Plus size={16} style={{ marginRight: '4px', display: 'inline' }} /> Ajouter
-              </button>
-            </div>
+            <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Factures à payer</b>
             <TableFactures
               factures={factures.filter(f => f.statut === 'à payer')}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
