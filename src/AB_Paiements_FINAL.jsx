@@ -218,7 +218,7 @@ export default function ABPaiements() {
 
       {/* BODY */}
       <div style={{ padding: '14px 12px 26px', maxWidth: '980px', margin: '0 auto' }}>
-        {showFormulaire && (
+        {showFormulaire && activeTab === 'a-payer' && (
           <FormulaireFacture
             facture={editingFacture}
             fournisseurs={fournisseurs}
