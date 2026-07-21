@@ -118,6 +118,18 @@ export default function ABPaiements() {
     loadData();
   };
 
+  const handleModifierFournisseur = async (fournisseur) => {
+    await gs.updateFournisseur(fournisseur);
+    loadData();
+  };
+
+  const handleSupprimerFournisseur = async (id) => {
+    if (window.confirm('Supprimer ce fournisseur ?')) {
+      await gs.deleteFournisseur(id);
+      loadData();
+    }
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -388,7 +400,7 @@ export default function ABPaiements() {
 
         {/* ANNUAIRE */}
         {activeTab === 'annuaire' && (
-          <AnnuaireFournisseurs fournisseurs={fournisseurs} onAjouter={handleAjouterFournisseur} />
+          <AnnuaireFournisseurs fournisseurs={fournisseurs} onAjouter={handleAjouterFournisseur} onModifier={handleModifierFournisseur} onSupprimer={handleSupprimerFournisseur} />
         )}
       </div>
     </div>
@@ -812,27 +824,61 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
   );
 }
 
-function AnnuaireFournisseurs({ fournisseurs, onAjouter }) {
+function AnnuaireFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer }) {
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    nom: '',
-    adresse: '',
-    email: '',
-    telephone: '',
-    conditionsPaiement: '30 jours'
-  });
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({ nom: '' });
+  const [erreur, setErreur] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAjouter(formData);
-    setFormData({ nom: '', adresse: '', email: '', telephone: '', conditionsPaiement: '30 jours' });
+    setErreur('');
+
+    if (!formData.nom.trim()) {
+      setErreur('Le nom est requis');
+      return;
+    }
+
+    // Vérifier les doublons (sauf si on edit le même)
+    const nomExiste = fournisseurs.some(f => 
+      f.nom.toLowerCase() === formData.nom.trim().toLowerCase() && 
+      f.id !== editingId
+    );
+
+    if (nomExiste) {
+      setErreur('Ce fournisseur existe déjà');
+      return;
+    }
+
+    if (editingId) {
+      onModifier({ ...formData, id: editingId });
+    } else {
+      onAjouter({ nom: formData.nom.trim() });
+    }
+
+    setFormData({ nom: '' });
+    setEditingId(null);
     setShowForm(false);
+  };
+
+  const handleEdit = (fournisseur) => {
+    setFormData({ nom: fournisseur.nom });
+    setEditingId(fournisseur.id);
+    setShowForm(true);
+    setErreur('');
+  };
+
+  const handleAnnuler = () => {
+    setFormData({ nom: '' });
+    setEditingId(null);
+    setShowForm(false);
+    setErreur('');
   };
 
   return (
     <div>
       <div style={{ display: 'flex', gap: '9px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <b style={{ fontSize: '14.5px' }}>Annuaire des fournisseurs</b>
+        <b style={{ fontSize: '14.5px' }}>Fournisseurs / Sous-traitants</b>
         <div style={{ flex: 1 }}></div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -859,15 +905,67 @@ function AnnuaireFournisseurs({ fournisseurs, onAjouter }) {
           padding: '14px 15px',
           marginBottom: '16px'
         }}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '9px' }}>
-            <input type="text" placeholder="Nom" value={formData.nom} onChange={(e) => setFormData({ ...formData, nom: e.target.value })} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }} />
-            <input type="text" placeholder="Adresse" value={formData.adresse} onChange={(e) => setFormData({ ...formData, adresse: e.target.value })} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }} />
-            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }} />
-            <input type="tel" placeholder="Téléphone" value={formData.telephone} onChange={(e) => setFormData({ ...formData, telephone: e.target.value })} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }} />
-            <input type="text" placeholder="Conditions de paiement" value={formData.conditionsPaiement} onChange={(e) => setFormData({ ...formData, conditionsPaiement: e.target.value })} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', gridColumn: '1 / -1' }} />
-            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px' }}>
-              <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Ajouter</button>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>Annuler</button>
+          <form onSubmit={handleSubmit}>
+            {erreur && (
+              <div style={{
+                background: 'rgba(179,53,44,.15)',
+                color: '#B3352C',
+                padding: '9px 11px',
+                borderRadius: '7px',
+                marginBottom: '9px',
+                fontSize: '13px'
+              }}>
+                ⚠️ {erreur}
+              </div>
+            )}
+            <input
+              type="text"
+              placeholder="Nom du fournisseur / sous-traitant"
+              value={formData.nom}
+              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+              required
+              autoFocus
+              style={{
+                background: '#fff',
+                border: '1px solid rgba(22,45,73,.25)',
+                borderRadius: '7px',
+                padding: '9px 11px',
+                fontSize: '13.5px',
+                width: '100%',
+                marginBottom: '9px'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '9px' }}>
+              <button
+                type="submit"
+                style={{
+                  background: '#2E7D46',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '11px 22px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {editingId ? 'Modifier' : 'Ajouter'}
+              </button>
+              <button
+                type="button"
+                onClick={handleAnnuler}
+                style={{
+                  background: '#fff',
+                  border: '1px solid rgba(22,45,73,.25)',
+                  borderRadius: '7px',
+                  padding: '10px 16px',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Annuler
+              </button>
             </div>
           </form>
         </div>
@@ -875,7 +973,7 @@ function AnnuaireFournisseurs({ fournisseurs, onAjouter }) {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
         gap: '12px'
       }}>
         {fournisseurs.map(f => (
@@ -883,26 +981,59 @@ function AnnuaireFournisseurs({ fournisseurs, onAjouter }) {
             background: '#fff',
             borderRadius: '10px',
             padding: '13px 15px',
-            boxShadow: '0 1px 4px rgba(22,45,73,.10)'
+            boxShadow: '0 1px 4px rgba(22,45,73,.10)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            <b style={{ fontSize: '15.5px', display: 'block', marginBottom: '8px' }}>{f.nom}</b>
-            <div style={{ fontSize: '12px' }}>
-              <div style={{ marginBottom: '6px' }}>
-                <small style={{ opacity: 0.6, fontSize: '10px', textTransform: 'uppercase' }}>Email</small>
-                <div style={{ fontWeight: 600 }}>{f.email}</div>
-              </div>
-              <div style={{ marginBottom: '6px' }}>
-                <small style={{ opacity: 0.6, fontSize: '10px', textTransform: 'uppercase' }}>Téléphone</small>
-                <div style={{ fontWeight: 600 }}>{f.telephone}</div>
-              </div>
-              <div>
-                <small style={{ opacity: 0.6, fontSize: '10px', textTransform: 'uppercase' }}>Conditions</small>
-                <div style={{ fontWeight: 600 }}>{f.conditionsPaiement}</div>
-              </div>
+            <b style={{ fontSize: '15.5px', marginBottom: '10px', color: '#162D49' }}>{f.nom}</b>
+            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+              <button
+                onClick={() => handleEdit(f)}
+                style={{
+                  flex: 1,
+                  background: '#C9A227',
+                  color: '#162D49',
+                  border: 'none',
+                  borderRadius: '7px',
+                  padding: '8px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                ✎ Modifier
+              </button>
+              <button
+                onClick={() => onSupprimer(f.id)}
+                style={{
+                  flex: 1,
+                  background: '#B3352C',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '7px',
+                  padding: '8px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                🗑️ Supprimer
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {fournisseurs.length === 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: '20px',
+          color: '#888',
+          fontSize: '14px'
+        }}>
+          Aucun fournisseur pour le moment
+        </div>
+      )}
     </div>
   );
 }
