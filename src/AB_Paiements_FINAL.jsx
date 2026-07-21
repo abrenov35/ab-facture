@@ -712,27 +712,38 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
         </div>
       )}
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px' }}>
-        {fournisseurs.map(f => (
-          <div key={f.id} style={{ background: '#fff', borderRadius: '10px', padding: '13px 15px', boxShadow: '0 1px 4px rgba(22,45,73,.10)', minWidth: '200px', flex: '0 0 auto' }}>
-            <b style={{ fontSize: '15px', display: 'block', marginBottom: '6px', color: '#162D49' }}>{f.nom}</b>
-            {f.type && <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>{f.type}</div>}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => handleEdit(f)}
-                style={{ flex: 1, background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '7px', padding: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                ✎ Modifier
-              </button>
-              <button
-                onClick={() => onSupprimer(f.id)}
-                style={{ flex: 1, background: '#B3352C', color: '#fff', border: 'none', borderRadius: '7px', padding: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                🗑️ Supprimer
-              </button>
-            </div>
-          </div>
-        ))}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ background: '#162D49', color: '#fff' }}>
+              <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Fournisseur</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Type / Métier</th>
+              <th style={{ padding: '12px', textAlign: 'center', fontSize: '13px', fontWeight: 600 }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fournisseurs.map((f, i) => (
+              <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
+                <td style={{ padding: '12px', fontSize: '13px', fontWeight: 600, color: '#162D49' }}>{f.nom}</td>
+                <td style={{ padding: '12px', fontSize: '13px', color: '#666' }}>{f.type || '-'}</td>
+                <td style={{ padding: '12px', textAlign: 'center' }}>
+                  <button
+                    onClick={() => handleEdit(f)}
+                    style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', marginRight: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    ✎ Modifier
+                  </button>
+                  <button
+                    onClick={() => onSupprimer(f.id)}
+                    style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    🗑️ Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {fournisseurs.length === 0 && (
