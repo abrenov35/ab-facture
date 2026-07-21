@@ -372,6 +372,25 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
   });
   const [newFournisseur, setNewFournisseur] = useState({ nom: '', type: '' });
 
+  // Réinitialiser le formulaire quand facture change
+  useEffect(() => {
+    if (facture) {
+      setFormData(facture);
+    } else {
+      setFormData({
+        fournisseur: '',
+        typeFournisseur: '',
+        numero: '',
+        dateFacture: new Date().toISOString().split('T')[0],
+        dateEcheance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        montantTTC: '',
+        chantier: '',
+        statut: 'à payer',
+        datePaiement: '',
+      });
+    }
+  }, [facture]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
@@ -475,8 +494,8 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
         )}
 
         <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>N° facture *</label>
-          <input type="text" name="numero" value={formData.numero} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>N° facture</label>
+          <input type="text" name="numero" value={formData.numero} onChange={handleChange} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
         </div>
 
         <div>
