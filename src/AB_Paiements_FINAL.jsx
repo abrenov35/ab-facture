@@ -36,6 +36,7 @@ export default function ABPaiements() {
   const [editingFacture, setEditingFacture] = useState(null);
   const [editingFournisseur, setEditingFournisseur] = useState(null);
   const [showFormulaire, setShowFormulaire] = useState(false);
+  const [factureToPay, setFactureToPay] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,6 +86,17 @@ export default function ABPaiements() {
     setActiveTab(tabId);
     setShowFormulaire(false);
     setEditingFacture(null);
+  };
+
+  const handlePayer = (facture) => {
+    setFactureToPay(facture);
+  };
+
+  const handleConfirmerPaiement = (facturePayee) => {
+    let updatedFactures = factures.map(f => f.id === facturePayee.id ? facturePayee : f);
+    setFactures(updatedFactures);
+    localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
+    setFactureToPay(null);
   };
 
   const handleSauvegarder = async (nouvelleFacture) => {
@@ -238,6 +250,7 @@ export default function ABPaiements() {
               factures={factures.filter(f => f.statut === 'à payer')}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
               onDelete={handleSupprimer}
+              onPayer={handlePayer}
               estEnRetard={estEnRetard}
               estEcheanceProche={estEcheanceProche}
               formatDate={formatDate}
@@ -273,6 +286,14 @@ export default function ABPaiements() {
           />
         )}
       </div>
+
+      {factureToPay && (
+        <ModalPaiement
+          facture={factureToPay}
+          onConfirmer={handleConfirmerPaiement}
+          onAnnuler={() => setFactureToPay(null)}
+        />
+      )}
     </div>
   );
 }
@@ -286,7 +307,7 @@ function StatCard({ titre, montant, bg, color }) {
   );
 }
 
-function TableFactures({ factures, onEdit, onDelete, estEnRetard, estEcheanceProche, formatDate, formatMontant }) {
+function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEcheanceProche, formatDate, formatMontant }) {
   if (factures.length === 0) {
     return <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Aucune facture</div>;
   }
@@ -317,6 +338,9 @@ function TableFactures({ factures, onEdit, onDelete, estEnRetard, estEcheancePro
                 {f.statut === 'payée' && <span style={{ background: '#2E7D46', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
               </td>
               <td style={{ padding: '10px', textAlign: 'center' }}>
+                {onPayer && f.statut === 'à payer' && (
+                  <button onClick={() => onPayer(f)} style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
+                )}
                 <button onClick={() => onEdit(f)} style={{ background: '#C9A227', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
                 <button onClick={() => onDelete(f.id)} style={{ background: '#B3352C', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
               </td>
@@ -486,13 +510,107 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
 
         <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '9px' }}>
           <button type="submit" style={{ background: '#2E7D46', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
-            {facture ? 'Modifier' : 'Enregistrer'}
+            Enregistrer
           </button>
           <button type="button" onClick={onAnnuler} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
             Annuler
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// Modal pour payer rapidement
+function ModalPaiement({ facture, onConfirmer, onAnnuler }) {
+  const [datePaiement, setDatePaiement] = useState(new Date().toISOString().split('T')[0]);
+
+  const handleConfirm = () => {
+    onConfirmer({
+      ...facture,
+      statut: 'payée',
+      datePaiement: datePaiement
+    });
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        background: '#fff',
+        borderRadius: '10px',
+        padding: '20px',
+        maxWidth: '400px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+      }}>
+        <h3 style={{ margin: '0 0 15px', fontSize: '16px', color: '#162D49' }}>Marquer comme payée</h3>
+        <div style={{ marginBottom: '15px' }}>
+          <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#666' }}>
+            <b>{facture.fournisseur}</b> - {facture.numero}
+          </p>
+          <p style={{ margin: '0', fontSize: '14px', color: '#888' }}>Montant : <b>{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(facture.montantTTC)}</b></p>
+        </div>
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '5px', opacity: 0.7 }}>Date de paiement *</label>
+          <input
+            type="date"
+            value={datePaiement}
+            onChange={(e) => setDatePaiement(e.target.value)}
+            style={{
+              background: '#fff',
+              border: '1px solid rgba(22,45,73,.25)',
+              borderRadius: '7px',
+              padding: '9px 11px',
+              fontSize: '13.5px',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '9px' }}>
+          <button
+            onClick={handleConfirm}
+            style={{
+              flex: 1,
+              background: '#2E7D46',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '11px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            ✓ Payer
+          </button>
+          <button
+            onClick={onAnnuler}
+            style={{
+              flex: 1,
+              background: '#fff',
+              border: '1px solid rgba(22,45,73,.25)',
+              borderRadius: '7px',
+              padding: '10px 16px',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
