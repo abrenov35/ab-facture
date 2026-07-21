@@ -127,6 +127,10 @@ export default function ABPaiements() {
     return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
+  const sortByEcheance = (factures) => {
+    return [...factures].sort((a, b) => new Date(a.dateEcheance) - new Date(b.dateEcheance));
+  };
+
   const formatMontant = (montant) => {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }).format(montant);
   };
@@ -146,7 +150,7 @@ export default function ABPaiements() {
 
   const totalAPayer = factures.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
   const totalEnRetard = factures.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
-  const factureBientot = factures.filter(f => estEcheanceProche(f.dateEcheance, f.statut));
+  const factureBientot = sortByEcheance(factures.filter(f => estEcheanceProche(f.dateEcheance, f.statut)));
 
   if (loading) {
     return <div style={{ padding: '20px', textAlign: 'center', color: '#162D49' }}>⏳ Chargement...</div>;
@@ -252,7 +256,7 @@ export default function ABPaiements() {
           <div>
             <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Factures à payer</b>
             <TableFactures
-              factures={factures.filter(f => f.statut === 'à payer')}
+              factures={sortByEcheance(factures.filter(f => f.statut === 'à payer'))}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
               onDelete={handleSupprimer}
               onPayer={handlePayer}
@@ -269,7 +273,7 @@ export default function ABPaiements() {
           <div>
             <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Factures payées</b>
             <TableFactures
-              factures={factures.filter(f => f.statut === 'payée')}
+              factures={sortByEcheance(factures.filter(f => f.statut === 'payée'))}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
               onDelete={handleSupprimer}
               estEnRetard={estEnRetard}
