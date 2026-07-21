@@ -709,9 +709,9 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px' }}>
         {fournisseurs.map(f => (
-          <div key={f.id} style={{ background: '#fff', borderRadius: '10px', padding: '13px 15px', boxShadow: '0 1px 4px rgba(22,45,73,.10)' }}>
+          <div key={f.id} style={{ background: '#fff', borderRadius: '10px', padding: '13px 15px', boxShadow: '0 1px 4px rgba(22,45,73,.10)', minWidth: '200px', flex: '0 0 auto' }}>
             <b style={{ fontSize: '15px', display: 'block', marginBottom: '6px', color: '#162D49' }}>{f.nom}</b>
             {f.type && <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>{f.type}</div>}
             <div style={{ display: 'flex', gap: '8px' }}>
