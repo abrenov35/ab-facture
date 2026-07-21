@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ab-facture/static/css/main.73169e50.css",
-    "main.js": "/ab-facture/static/js/main.def725c8.js",
+    "main.js": "/ab-facture/static/js/main.1dd5174d.js",
     "index.html": "/ab-facture/index.html",
     "main.73169e50.css.map": "/ab-facture/static/css/main.73169e50.css.map",
-    "main.def725c8.js.map": "/ab-facture/static/js/main.def725c8.js.map"
+    "main.1dd5174d.js.map": "/ab-facture/static/js/main.1dd5174d.js.map"
   },
   "entrypoints": [
     "static/css/main.73169e50.css",
-    "static/js/main.def725c8.js"
+    "static/js/main.1dd5174d.js"
   ]
 }
