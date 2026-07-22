@@ -471,8 +471,8 @@ function ABPaiements() {
                   key={tab.id}
                   onClick={() => handleChangeTab(tab.id)}
                   style={{
-                    border: activeTab === tab.id ? '1px solid #C9A227' : '1px solid rgba(255,255,255,.35)',
-                    background: activeTab === tab.id ? '#D4B76A' : 'transparent',
+                    border: activeTab === tab.id ? '1px solid #fff' : '1px solid rgba(255,255,255,.35)',
+                    background: activeTab === tab.id ? '#fff' : 'transparent',
                     color: activeTab === tab.id ? '#162D49' : '#fff',
                     borderRadius: '7px',
                     padding: '7px 13px',
@@ -1445,7 +1445,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
               <th style={{ padding: '10px 12px', textAlign: 'right' }}>
                 <button
                   onClick={() => setShowForm(true)}
-                  style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: '#fff', color: '#162D49', border: 'none', borderRadius: '7px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
                 >
                   ➕ Ajouter
                 </button>
