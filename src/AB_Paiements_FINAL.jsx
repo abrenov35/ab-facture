@@ -1350,7 +1350,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
             <tr style={{ background: '#162D49', color: '#fff' }}>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Fournisseur</th>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Type / Métier</th>
-              <th style={{ padding: '12px', textAlign: 'right', fontSize: '13px', fontWeight: 600 }}>Actions</th>
+              <th style={{ padding: '12px', textAlign: 'right', fontSize: '13px', fontWeight: 600 }}></th>
             </tr>
           </thead>
           <tbody>
