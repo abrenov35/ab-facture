@@ -599,8 +599,8 @@ function ABPaiements() {
             {/* RÉSUMÉ DE L'ANNÉE */}
             {anneeFiltre && (
               <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
-                <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
-                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Résumé de l'année {anneeFiltre}</b>
+                <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                  <b style={{ fontSize: '15px', color: '#fff' }}>📅 Résumé de l'année {anneeFiltre}</b>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>{fournisseurFiltre ? `Fournisseur: ${fournisseurFiltre}` : 'Tous les fournisseurs'}</span>
                 </div>
                 
@@ -783,8 +783,8 @@ function ABPaiements() {
 
             {factureBientot.length > 0 && (
               <div style={{ background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)', marginBottom: '20px' }}>
-                <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
-                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Échéances proches</b>
+                <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                  <b style={{ fontSize: '15px', color: '#fff' }}>📅 Échéances proches</b>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>{factureBientot.length} facture{factureBientot.length > 1 ? 's' : ''} dans les 7 prochains jours</span>
                 </div>
                 <div style={{ padding: '12px 0' }}>
