@@ -1,35 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 
-// API Google Sheets
-const useGoogleSheets = () => {
-  const API_URL = 'https://script.google.com/macros/s/AKfycbwnR4gsuuEnZtn4eqDRwG_PXKi2cSpXnwM7bMS1er8IkUvppKSh8K1EJmADG-MTz1jMTw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbySr3kGVj6Uqjjj44_cV9teMMeZym8ayVWo2RX4RV76KO0Q_AWW8O4PJnKlwXJ1OFmkTw/exec';
 
-  const callAPI = async (action, data = null) => {
-    try {
-      const params = new URLSearchParams();
-      params.append('action', action);
-      if (data) params.append('data', JSON.stringify(data));
-      const url = `${API_URL}?${params.toString()}`;
-      const response = await fetch(url);
-      const result = await response.json();
-      return result.success ? result.data : null;
-    } catch (error) {
-      console.error(`Erreur API:`, error);
-      return null;
-    }
-  };
-
-  return {
-    getFactures: () => callAPI('getFactures'),
-    addFacture: (f) => callAPI('addFacture', f),
-    updateFacture: (f) => callAPI('updateFacture', f),
-    deleteFacture: (id) => callAPI('deleteFacture', { id })
-  };
-};
-
-export default function ABPaiements() {
-  const gs = useGoogleSheets();
+function ABPaiements() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [fournisseurFiltre, setFournisseurFiltre] = useState('');
   const [anneeFiltre, setAnneeFiltre] = useState('');
@@ -46,41 +20,98 @@ export default function ABPaiements() {
   }, []);
 
   const loadData = async () => {
-    // Charger depuis localStorage
-    const savedFactures = localStorage.getItem('ab_factures');
-    const savedFournisseurs = localStorage.getItem('ab_fournisseurs');
-    
-    if (savedFactures) {
-      setFactures(JSON.parse(savedFactures));
+    try {
+      setLoading(true);
+      
+      // Charger les factures depuis Google Sheets
+      const facResponse = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getFactures' })
+      });
+      const facData = await facResponse.json();
+      if (facData.success) {
+        setFactures(facData.data);
+      }
+      
+      // Charger les fournisseurs depuis Google Sheets
+      const fournResponse = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getFournisseurs' })
+      });
+      const fournData = await fournResponse.json();
+      if (fournData.success) {
+        setFournisseurs(fournData.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement:', error);
+      alert('Erreur de connexion à Google Sheets');
+    } finally {
+      setLoading(false);
     }
-    if (savedFournisseurs) {
-      setFournisseurs(JSON.parse(savedFournisseurs));
-    }
-    
-    setLoading(false);
   };
 
   const handleAjouterFournisseur = async (newFourn) => {
     if (!fournisseurs.find(f => f.nom.toLowerCase() === newFourn.nom.toLowerCase())) {
-      const newFournisseur = { id: Math.random().toString(36).substr(2, 9), ...newFourn };
-      const updatedFournisseurs = [...fournisseurs, newFournisseur];
-      setFournisseurs(updatedFournisseurs);
-      localStorage.setItem('ab_fournisseurs', JSON.stringify(updatedFournisseurs));
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'addFournisseur',
+            fournisseur: newFourn
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          setFournisseurs([...fournisseurs, data.data]);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de l\'ajout du fournisseur');
+      }
     }
   };
 
-  const handleModifierFournisseur = (updatedFourn) => {
-    const updated = fournisseurs.map(f => f.id === updatedFourn.id ? updatedFourn : f);
-    setFournisseurs(updated);
-    localStorage.setItem('ab_fournisseurs', JSON.stringify(updated));
-    setEditingFournisseur(null);
+  const handleModifierFournisseur = async (updatedFourn) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          action: 'updateFournisseur',
+          id: updatedFourn.id,
+          fournisseur: updatedFourn
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        const updated = fournisseurs.map(f => f.id === updatedFourn.id ? data.data : f);
+        setFournisseurs(updated);
+        setEditingFournisseur(null);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la modification');
+    }
   };
 
-  const handleSupprimerFournisseur = (id) => {
+  const handleSupprimerFournisseur = async (id) => {
     if (window.confirm('Supprimer ce fournisseur ?')) {
-      const updated = fournisseurs.filter(f => f.id !== id);
-      setFournisseurs(updated);
-      localStorage.setItem('ab_fournisseurs', JSON.stringify(updated));
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'deleteFournisseur',
+            id: id
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          const updated = fournisseurs.filter(f => f.id !== id);
+          setFournisseurs(updated);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
+      }
     }
   };
 
@@ -102,32 +133,88 @@ export default function ABPaiements() {
     setFactureToPay(facture);
   };
 
-  const handleConfirmerPaiement = (facturePayee) => {
-    let updatedFactures = factures.map(f => f.id === facturePayee.id ? facturePayee : f);
-    setFactures(updatedFactures);
-    localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
-    setFactureToPay(null);
+  const handleConfirmerPaiement = async (facturePayee) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          action: 'updateFacture',
+          id: facturePayee.id,
+          facture: facturePayee
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        let updatedFactures = factures.map(f => f.id === facturePayee.id ? data.data : f);
+        setFactures(updatedFactures);
+        setFactureToPay(null);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors du paiement');
+    }
   };
 
   const handleSauvegarder = async (nouvelleFacture) => {
-    let updatedFactures;
-    if (editingFacture) {
-      updatedFactures = factures.map(f => f.id === editingFacture.id ? { ...nouvelleFacture, id: editingFacture.id } : f);
-    } else {
-      const newId = Math.random().toString(36).substr(2, 9);
-      updatedFactures = [...factures, { ...nouvelleFacture, id: newId }];
+    try {
+      let response;
+      if (editingFacture) {
+        // Mise à jour
+        response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'updateFacture',
+            id: editingFacture.id,
+            facture: { ...nouvelleFacture, id: editingFacture.id }
+          })
+        });
+      } else {
+        // Création
+        response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'addFacture',
+            facture: nouvelleFacture
+          })
+        });
+      }
+      
+      const data = await response.json();
+      if (data.success) {
+        if (editingFacture) {
+          const updatedFactures = factures.map(f => f.id === editingFacture.id ? data.data : f);
+          setFactures(updatedFactures);
+        } else {
+          setFactures([...factures, data.data]);
+        }
+        setEditingFacture(null);
+        setShowFormulaire(false);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de l\'enregistrement');
     }
-    setFactures(updatedFactures);
-    localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
-    setEditingFacture(null);
-    setShowFormulaire(false);
   };
 
   const handleSupprimer = async (id) => {
     if (window.confirm('Êtes-vous sûr ?')) {
-      const updatedFactures = factures.filter(f => f.id !== id);
-      setFactures(updatedFactures);
-      localStorage.setItem('ab_factures', JSON.stringify(updatedFactures));
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            action: 'deleteFacture',
+            id: id
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          const updatedFactures = factures.filter(f => f.id !== id);
+          setFactures(updatedFactures);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
+      }
     }
   };
 
@@ -1117,3 +1204,5 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
     </div>
   );
 }
+
+export default ABPaiements;
