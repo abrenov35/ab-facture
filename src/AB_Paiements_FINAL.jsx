@@ -738,15 +738,11 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
           <input type="text" name="chantier" value={formData.chantier} onChange={handleChange} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
         </div>
 
-        <div>
-          <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Statut *</label>
-          <select name="statut" value={formData.statut} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }}>
-            <option value="à payer">À payer</option>
-            <option value="payée">Payée</option>
-          </select>
-        </div>
+        {/* Statut caché - toujours "à payer" pour les nouvelles factures */}
+        <input type="hidden" name="statut" value="à payer" />
 
-        {formData.statut === 'payée' && (
+        {/* Date paiement - seulement pour les factures existantes payées */}
+        {facture && formData.statut === 'payée' && (
           <div>
             <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Date paiement *</label>
             <input type="date" name="datePaiement" value={formData.datePaiement} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
