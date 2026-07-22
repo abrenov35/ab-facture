@@ -221,6 +221,25 @@ function ABPaiements() {
     }
   };
 
+  // Fonction pour convertir une date au format YYYY-MM-DD
+  const toISODate = (dateInput) => {
+    if (!dateInput || dateInput === '') return '';
+    
+    // Si c'est déjà au format YYYY-MM-DD, retourner tel quel
+    if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateInput;
+    }
+    
+    const d = parseDate(dateInput);
+    if (!d || isNaN(d.getTime())) return '';
+    
+    try {
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return '';
+    }
+  };
+
   const parseDate = (dateInput) => {
     if (!dateInput || dateInput === '' || dateInput === 'Invalid Date') return null;
     
@@ -516,6 +535,7 @@ function ABPaiements() {
                 onSauvegarder={handleSauvegarder}
                 onAnnuler={() => { setShowFormulaire(false); setEditingFacture(null); }}
                 onAjouterFournisseur={handleAjouterFournisseur}
+                toISODate={toISODate}
               />
             </div>
           </div>
@@ -901,8 +921,13 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
   );
 }
 
-function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, onAjouterFournisseur }) {
-  const [formData, setFormData] = useState(facture || {
+function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, onAjouterFournisseur, toISODate }) {
+  const [formData, setFormData] = useState(facture ? {
+    ...facture,
+    dateFacture: toISODate(facture.dateFacture),
+    dateEcheance: toISODate(facture.dateEcheance),
+    datePaiement: toISODate(facture.datePaiement)
+  } : {
     fournisseur: '',
     typeFournisseur: '',
     numero: '',
@@ -918,7 +943,12 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
   // Réinitialiser le formulaire quand facture change
   useEffect(() => {
     if (facture) {
-      setFormData(facture);
+      setFormData({
+        ...facture,
+        dateFacture: toISODate(facture.dateFacture),
+        dateEcheance: toISODate(facture.dateEcheance),
+        datePaiement: toISODate(facture.datePaiement)
+      });
     } else {
       setFormData({
         fournisseur: '',
