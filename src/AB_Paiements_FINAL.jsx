@@ -670,8 +670,8 @@ function ABPaiements() {
               const sortedMonths = Object.keys(apayerByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
-                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
-                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📌 À payer par mois</b>
+                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                    <b style={{ fontSize: '15px', color: '#fff' }}>📌 À payer par mois</b>
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Factures en attente (non en retard)</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -709,8 +709,8 @@ function ABPaiements() {
               const sortedMonths = Object.keys(enRetardByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
-                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #E08080' }}>
-                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>⚠️ En retard par mois</b>
+                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #E08080', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                    <b style={{ fontSize: '15px', color: '#fff' }}>⚠️ En retard par mois</b>
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Factures dépassant leur date d'échéance</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -748,8 +748,8 @@ function ABPaiements() {
               const sortedMonths = Object.keys(payeesByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
-                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #7BB38F' }}>
-                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>✓ Payées par mois</b>
+                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #7BB38F', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                    <b style={{ fontSize: '15px', color: '#fff' }}>✓ Payées par mois</b>
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Historique des factures payées</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
