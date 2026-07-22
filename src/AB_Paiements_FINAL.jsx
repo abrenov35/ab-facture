@@ -475,6 +475,7 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
             <thead>
               <tr style={{ background: '#f0f0f0', borderBottom: '1px solid #ddd' }}>
                 <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Fournisseur</th>
+                <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Chantier</th>
                 <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>N° facture</th>
                 <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Montant TTC</th>
                 <th style={{ padding: '10px', textAlign: 'left', fontSize: '12px', fontWeight: 600 }}>Échéance</th>
@@ -486,6 +487,7 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
               {monthGroups[monthKey].map((f, i) => (
                 <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
                   <td style={{ padding: '10px', fontSize: '13px' }}>{f.fournisseur}</td>
+                  <td style={{ padding: '10px', fontSize: '13px', color: '#666' }}>{f.chantier || '-'}</td>
                   <td style={{ padding: '10px', fontSize: '13px' }}>{f.numero}</td>
                   <td style={{ padding: '10px', fontSize: '13px', fontWeight: 600 }}>{formatMontant(f.montantTTC)}</td>
                   <td style={{ padding: '10px', fontSize: '13px' }}>{formatDate(f.dateEcheance)}</td>
