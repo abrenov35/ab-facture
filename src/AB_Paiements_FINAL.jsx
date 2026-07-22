@@ -131,6 +131,25 @@ export default function ABPaiements() {
     return [...factures].sort((a, b) => new Date(a.dateEcheance) - new Date(b.dateEcheance));
   };
 
+  const groupFacturesByMonth = (factures) => {
+    const groups = {};
+    factures.forEach(f => {
+      const date = new Date(f.dateEcheance + 'T00:00:00Z');
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (!groups[monthKey]) {
+        groups[monthKey] = [];
+      }
+      groups[monthKey].push(f);
+    });
+    return groups;
+  };
+
+  const getMonthLabel = (monthKey) => {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(year, parseInt(month) - 1);
+    return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  };
+
   const formatMontant = (montant) => {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }).format(montant);
   };
@@ -266,6 +285,78 @@ export default function ABPaiements() {
               <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(224,128,128,.15)" color="#E08080" />
               <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
             </div>
+
+            {/* À PAYER PAR MOIS */}
+            {(() => {
+              const apayerByMonth = groupFacturesByMonth(factures.filter(f => f.statut === 'à payer'));
+              const sortedMonths = Object.keys(apayerByMonth).sort();
+              return sortedMonths.length > 0 && (
+                <div style={{ marginBottom: '25px' }}>
+                  <b style={{ fontSize: '13px', marginBottom: '10px', display: 'block', color: '#162D49' }}>📌 À payer par mois</b>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                      <thead>
+                        <tr style={{ background: '#f5f5f5' }}>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Mois</th>
+                          <th style={{ padding: '8px', textAlign: 'right' }}>Montant</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedMonths.map((month, i) => {
+                          const total = apayerByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+                          return (
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
+                              <td style={{ padding: '8px' }}>{getMonthLabel(month)}</td>
+                              <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>{formatMontant(total)}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr style={{ background: '#f5f5f5', fontWeight: 700 }}>
+                          <td style={{ padding: '8px' }}>TOTAL À PAYER</td>
+                          <td style={{ padding: '8px', textAlign: 'right', color: '#E08080' }}>{formatMontant(totalAPayer)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* EN RETARD PAR MOIS */}
+            {(() => {
+              const enRetardByMonth = groupFacturesByMonth(factures.filter(f => estEnRetard(f.dateEcheance, f.statut)));
+              const sortedMonths = Object.keys(enRetardByMonth).sort();
+              return sortedMonths.length > 0 && (
+                <div style={{ marginBottom: '25px' }}>
+                  <b style={{ fontSize: '13px', marginBottom: '10px', display: 'block', color: '#162D49' }}>⚠️ En retard par mois</b>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                      <thead>
+                        <tr style={{ background: '#f5f5f5' }}>
+                          <th style={{ padding: '8px', textAlign: 'left' }}>Mois</th>
+                          <th style={{ padding: '8px', textAlign: 'right' }}>Montant</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedMonths.map((month, i) => {
+                          const total = enRetardByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+                          return (
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
+                              <td style={{ padding: '8px' }}>{getMonthLabel(month)}</td>
+                              <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>{formatMontant(total)}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr style={{ background: '#f5f5f5', fontWeight: 700 }}>
+                          <td style={{ padding: '8px' }}>TOTAL EN RETARD</td>
+                          <td style={{ padding: '8px', textAlign: 'right', color: '#E8B66E' }}>{formatMontant(totalEnRetard)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
 
             {factureBientot.length > 0 && (
               <div style={{ background: 'rgba(212,183,106,.15)', border: '1px solid rgba(212,183,106,.3)', borderRadius: '10px', padding: '12px 15px', marginBottom: '20px' }}>
