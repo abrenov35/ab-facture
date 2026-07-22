@@ -295,7 +295,7 @@ export default function ABPaiements() {
               padding: '20px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <b style={{ fontSize: '16px', color: '#162D49' }}>Nouvelle facture</b>
+                <b style={{ fontSize: '16px', color: '#162D49' }}>{editingFacture ? '✎ Modifier la facture' : '➕ Nouvelle facture'}</b>
                 <button onClick={() => { setShowFormulaire(false); setEditingFacture(null); }} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#999' }}>✕</button>
               </div>
               <FormulaireFacture
@@ -738,11 +738,21 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
           <input type="text" name="chantier" value={formData.chantier} onChange={handleChange} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
         </div>
 
-        {/* Statut caché - toujours "à payer" pour les nouvelles factures */}
-        <input type="hidden" name="statut" value="à payer" />
+        {/* Champ Statut - seulement pour les factures existantes */}
+        {facture ? (
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Statut *</label>
+            <select name="statut" value={formData.statut} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }}>
+              <option value="à payer">À payer</option>
+              <option value="payée">Payée</option>
+            </select>
+          </div>
+        ) : (
+          <input type="hidden" name="statut" value="à payer" />
+        )}
 
-        {/* Date paiement - seulement pour les factures existantes payées */}
-        {facture && formData.statut === 'payée' && (
+        {/* Date paiement - seulement pour les factures payées */}
+        {formData.statut === 'payée' && (
           <div>
             <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Date paiement *</label>
             <input type="date" name="datePaiement" value={formData.datePaiement} onChange={handleChange} required style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }} />
