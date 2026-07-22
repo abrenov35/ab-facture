@@ -218,14 +218,43 @@ export default function ABPaiements() {
 
       {/* BODY */}
       <div style={{ padding: '14px 12px 26px', maxWidth: '980px', margin: '0 auto' }}>
-        {showFormulaire && activeTab === 'a-payer' && (
-          <FormulaireFacture
-            facture={editingFacture}
-            fournisseurs={fournisseurs}
-            onSauvegarder={handleSauvegarder}
-            onAnnuler={() => { setShowFormulaire(false); setEditingFacture(null); }}
-            onAjouterFournisseur={handleAjouterFournisseur}
-          />
+        {showFormulaire && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+              maxWidth: '900px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              padding: '20px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <b style={{ fontSize: '16px', color: '#162D49' }}>Nouvelle facture</b>
+                <button onClick={() => { setShowFormulaire(false); setEditingFacture(null); }} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#999' }}>✕</button>
+              </div>
+              <FormulaireFacture
+                facture={editingFacture}
+                fournisseurs={fournisseurs}
+                onSauvegarder={handleSauvegarder}
+                onAnnuler={() => { setShowFormulaire(false); setEditingFacture(null); }}
+                onAjouterFournisseur={handleAjouterFournisseur}
+              />
+            </div>
+          </div>
         )}
 
         {/* TABLEAU DE BORD */}
