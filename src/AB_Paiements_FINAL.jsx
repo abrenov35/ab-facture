@@ -126,7 +126,10 @@ function ABPaiements() {
     : factures;
 
   const facturesFiltreesPeriode = anneeFiltre
-    ? facturesFiltrées.filter(f => new Date(f.dateEcheance).getFullYear().toString() === anneeFiltre)
+    ? facturesFiltrées.filter(f => {
+        const d = parseDate(f.dateEcheance);
+        return d ? d.getFullYear().toString() === anneeFiltre : false;
+      })
     : facturesFiltrées;
 
   const handlePayer = (facture) => {
@@ -218,20 +221,70 @@ function ABPaiements() {
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr + 'T00:00:00Z');
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const parseDate = (dateInput) => {
+    if (!dateInput) return null;
+    
+    // Si c'est déjà une Date
+    if (dateInput instanceof Date) return dateInput;
+    
+    // Convertir en string
+    let dateStr = String(dateInput).trim();
+    
+    // Si c'est un nombre (Excel serial date)
+    if (!isNaN(dateStr)) {
+      const num = parseFloat(dateStr);
+      const date = new Date((num - 25569) * 86400 * 1000);
+      return date;
+    }
+    
+    // Format ISO (YYYY-MM-DD)
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return new Date(dateStr + 'T00:00:00Z');
+    }
+    
+    // Format DD/MM/YYYY ou DD-MM-YYYY
+    if (dateStr.match(/^\d{2}[/-]\d{2}[/-]\d{4}$/)) {
+      const parts = dateStr.split(/[/-]/);
+      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00Z`);
+    }
+    
+    // Format MM/DD/YYYY (US)
+    if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
+      const parts = dateStr.split(/[/-]/);
+      if (parseInt(parts[0]) > 12) {
+        return new Date(`${parts[2]}-${parts[0]}-${parts[1]}T00:00:00Z`);
+      }
+    }
+    
+    // Essayer le parsing standard
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  const formatDate = (dateInput) => {
+    const d = parseDate(dateInput);
+    if (!d) return 'Date invalide';
+    try {
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch (e) {
+      return 'Date invalide';
+    }
   };
 
   const sortByEcheance = (factures) => {
-    return [...factures].sort((a, b) => new Date(a.dateEcheance) - new Date(b.dateEcheance));
+    return [...factures].sort((a, b) => {
+      const dateA = parseDate(a.dateEcheance);
+      const dateB = parseDate(b.dateEcheance);
+      if (!dateA || !dateB) return 0;
+      return dateA - dateB;
+    });
   };
 
   const groupFacturesByMonth = (factures) => {
     const groups = {};
     factures.forEach(f => {
-      const date = new Date(f.dateEcheance + 'T00:00:00Z');
+      const date = parseDate(f.dateEcheance);
+      if (!date) return;
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       if (!groups[monthKey]) {
         groups[monthKey] = [];
@@ -253,12 +306,15 @@ function ABPaiements() {
 
   const estEnRetard = (dateEcheance, statut) => {
     if (statut === 'payée') return false;
-    return new Date(dateEcheance) < new Date();
+    const d = parseDate(dateEcheance);
+    if (!d) return false;
+    return d < new Date();
   };
 
   const estEcheanceProche = (dateEcheance, statut) => {
     if (statut === 'payée') return false;
-    const d = new Date(dateEcheance);
+    const d = parseDate(dateEcheance);
+    if (!d) return false;
     const limite = new Date();
     limite.setDate(limite.getDate() + 7);
     return d >= new Date() && d <= limite;
@@ -356,7 +412,10 @@ function ABPaiements() {
                 }}
               >
                 <option value="">📅 Toutes les années</option>
-                {[...new Set(factures.map(f => new Date(f.dateEcheance).getFullYear()))].sort((a, b) => b - a).map(annee => (
+                {[...new Set(factures.map(f => {
+                  const d = parseDate(f.dateEcheance);
+                  return d ? d.getFullYear() : null;
+                }).filter(y => y))].sort((a, b) => b - a).map(annee => (
                   <option key={annee} value={annee.toString()}>
                     {annee}
                   </option>
@@ -668,6 +727,7 @@ function ABPaiements() {
               estEcheanceProche={estEcheanceProche}
               formatDate={formatDate}
               formatMontant={formatMontant}
+              parseDate={parseDate}
             />
           </div>
         )}
@@ -684,6 +744,7 @@ function ABPaiements() {
               estEcheanceProche={estEcheanceProche}
               formatDate={formatDate}
               formatMontant={formatMontant}
+              parseDate={parseDate}
             />
           </div>
         )}
@@ -728,7 +789,7 @@ function StatCard({ titre, montant, bg, color }) {
   );
 }
 
-function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEcheanceProche, formatDate, formatMontant }) {
+function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEcheanceProche, formatDate, formatMontant, parseDate }) {
   if (factures.length === 0) {
     return <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Aucune facture</div>;
   }
@@ -737,7 +798,8 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
   const groupByMonth = () => {
     const groups = {};
     factures.forEach(f => {
-      const date = new Date(f.dateEcheance + 'T00:00:00Z');
+      const date = parseDate(f.dateEcheance);
+      if (!date) return;
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       if (!groups[monthKey]) {
         groups[monthKey] = [];
