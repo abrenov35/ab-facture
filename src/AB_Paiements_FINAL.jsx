@@ -1272,7 +1272,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <b style={{ fontSize: '14.5px' }}>Fournisseurs / Sous-traitants</b>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => setShowForm(true)}
           style={{ background: '#162D49', color: '#fff', border: 'none', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}
         >
           ➕ Ajouter
@@ -1280,30 +1280,67 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
       </div>
 
       {showForm && (
-        <div style={{ background: 'rgba(212,183,106,.10)', border: '1px solid rgba(212,183,106,.4)', borderRadius: '10px', padding: '14px 15px', marginBottom: '16px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '9px', alignItems: 'flex-end' }}>
-            <input
-              type="text"
-              placeholder="Nom du fournisseur"
-              value={formData.nom}
-              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-              required
-              style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }}
-            />
-            <input
-              type="text"
-              placeholder="Type / Métier (ex: Plombier)"
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px' }}
-            />
-            <button type="submit" style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
-              {editingId ? 'Modifier' : 'Ajouter'}
-            </button>
-            <button type="button" onClick={handleCancel} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
-              Annuler
-            </button>
-          </form>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            maxWidth: '480px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            padding: '20px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <b style={{ fontSize: '16px', color: '#162D49' }}>{editingId ? '✎ Modifier le fournisseur' : '➕ Nouveau fournisseur'}</b>
+              <button onClick={handleCancel} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#999' }}>✕</button>
+            </div>
+            <div style={{ background: 'rgba(212,183,106,.10)', border: '1px solid rgba(212,183,106,.4)', borderRadius: '10px', padding: '14px 15px' }}>
+              <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Nom du fournisseur *</label>
+                  <input
+                    type="text"
+                    placeholder="Nom du fournisseur"
+                    value={formData.nom}
+                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                    required
+                    style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Type / Métier</label>
+                  <input
+                    type="text"
+                    placeholder="Type / Métier (ex: Plombier)"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '9px 11px', fontSize: '13.5px', width: '100%' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '9px', justifyContent: 'flex-end' }}>
+                  <button type="submit" style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px 22px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
+                    {editingId ? 'Modifier' : 'Ajouter'}
+                  </button>
+                  <button type="button" onClick={handleCancel} style={{ background: '#fff', border: '1px solid rgba(22,45,73,.25)', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}>
+                    Annuler
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       )}
 
