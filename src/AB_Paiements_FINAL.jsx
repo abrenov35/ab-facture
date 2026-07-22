@@ -31,6 +31,7 @@ const useGoogleSheets = () => {
 export default function ABPaiements() {
   const gs = useGoogleSheets();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [fournisseurFiltre, setFournisseurFiltre] = useState('');
   const [factures, setFactures] = useState([]);
   const [fournisseurs, setFournisseurs] = useState([]);
   const [editingFacture, setEditingFacture] = useState(null);
@@ -87,6 +88,10 @@ export default function ABPaiements() {
     setShowFormulaire(false);
     setEditingFacture(null);
   };
+
+  const facturesFiltrées = fournisseurFiltre 
+    ? factures.filter(f => f.fournisseur === fournisseurFiltre)
+    : factures;
 
   const handlePayer = (facture) => {
     setFactureToPay(facture);
@@ -167,9 +172,9 @@ export default function ABPaiements() {
     return d >= new Date() && d <= limite;
   };
 
-  const totalAPayer = factures.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
-  const totalEnRetard = factures.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
-  const factureBientot = sortByEcheance(factures.filter(f => estEcheanceProche(f.dateEcheance, f.statut)));
+  const totalAPayer = facturesFiltrées.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+  const totalEnRetard = facturesFiltrées.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+  const factureBientot = sortByEcheance(facturesFiltrées.filter(f => estEcheanceProche(f.dateEcheance, f.statut)));
 
   if (loading) {
     return <div style={{ padding: '20px', textAlign: 'center', color: '#162D49' }}>⏳ Chargement...</div>;
@@ -212,6 +217,34 @@ export default function ABPaiements() {
                 </button>
               ))}
             </div>
+            
+            {/* Dropdown filtre fournisseur */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <select
+                value={fournisseurFiltre}
+                onChange={(e) => setFournisseurFiltre(e.target.value)}
+                style={{
+                  background: '#fff',
+                  color: '#162D49',
+                  border: '1px solid rgba(255,255,255,.35)',
+                  borderRadius: '7px',
+                  padding: '7px 12px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              >
+                <option value="">🔍 Tous les fournisseurs</option>
+                {[...new Set(factures.map(f => f.fournisseur))].sort().map(fournisseur => (
+                  <option key={fournisseur} value={fournisseur}>
+                    {fournisseur}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Bouton Nouvelle facture */}
             <button
               onClick={() => { setShowFormulaire(true); setEditingFacture(null); }}
               style={{
@@ -288,7 +321,7 @@ export default function ABPaiements() {
 
             {/* À PAYER PAR MOIS */}
             {(() => {
-              const apayerByMonth = groupFacturesByMonth(factures.filter(f => f.statut === 'à payer'));
+              const apayerByMonth = groupFacturesByMonth(facturesFiltrées.filter(f => f.statut === 'à payer'));
               const sortedMonths = Object.keys(apayerByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '1px solid #e8e8e8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
@@ -327,7 +360,7 @@ export default function ABPaiements() {
 
             {/* EN RETARD PAR MOIS */}
             {(() => {
-              const enRetardByMonth = groupFacturesByMonth(factures.filter(f => estEnRetard(f.dateEcheance, f.statut)));
+              const enRetardByMonth = groupFacturesByMonth(facturesFiltrées.filter(f => estEnRetard(f.dateEcheance, f.statut)));
               const sortedMonths = Object.keys(enRetardByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '1px solid #e8e8e8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
@@ -399,7 +432,7 @@ export default function ABPaiements() {
           <div>
             <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Factures à payer</b>
             <TableFactures
-              factures={sortByEcheance(factures.filter(f => f.statut === 'à payer'))}
+              factures={sortByEcheance(facturesFiltrées.filter(f => f.statut === 'à payer'))}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
               onDelete={handleSupprimer}
               onPayer={handlePayer}
@@ -416,7 +449,7 @@ export default function ABPaiements() {
           <div>
             <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Factures payées</b>
             <TableFactures
-              factures={sortByEcheance(factures.filter(f => f.statut === 'payée'))}
+              factures={sortByEcheance(facturesFiltrées.filter(f => f.statut === 'payée'))}
               onEdit={(f) => { setEditingFacture(f); setShowFormulaire(true); }}
               onDelete={handleSupprimer}
               estEnRetard={estEnRetard}
