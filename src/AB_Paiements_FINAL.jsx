@@ -1435,15 +1435,17 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
                 <td style={{ padding: '12px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                   <button
                     onClick={() => handleEdit(f)}
-                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    title="Modifier"
+                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}
                   >
-                    ✎ Modifier
+                    ✎
                   </button>
                   <button
                     onClick={() => onSupprimer(f.id)}
-                    style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    title="Supprimer"
+                    style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}
                   >
-                    🗑️ Supprimer
+                    🗑️
                   </button>
                 </td>
               </tr>
