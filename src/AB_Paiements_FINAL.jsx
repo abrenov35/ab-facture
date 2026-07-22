@@ -1017,7 +1017,7 @@ function FormulaireFacture({ facture, fournisseurs, onSauvegarder, onAnnuler, on
         {facture ? 'Modifier la facture' : 'Nouvelle facture'}
       </h4>
       
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '9px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
         <div>
           <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, marginBottom: '3px', opacity: 0.7 }}>Fournisseur / Sous-traitant *</label>
           <select
