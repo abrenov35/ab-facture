@@ -717,9 +717,9 @@ function ABPaiements() {
                             <td style={{ padding: '10px 15px', fontSize: '12px', color: '#666' }}>{formatDate(f.dateEcheance)}</td>
                             <td style={{ padding: '10px 15px', textAlign: 'right', fontWeight: 600, color: '#162D49' }}>{formatMontant(f.montantTTC)}</td>
                             <td style={{ padding: '10px 15px', textAlign: 'center', fontSize: '11px' }}>
-                              {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#E08080', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>Retard</span>}
-                              {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>À payer</span>}
-                              {f.statut === 'payée' && <span style={{ background: '#7BB38F', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>Payée</span>}
+                              {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', padding: '3px 9px', borderRadius: '20px', fontWeight: 700, fontSize: '10px' }}>Retard</span>}
+                              {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#162D49', border: '1.5px solid #162D49', padding: '3px 9px', borderRadius: '20px', fontWeight: 700, fontSize: '10px' }}>À payer</span>}
+                              {f.statut === 'payée' && <span style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', padding: '3px 9px', borderRadius: '20px', fontWeight: 700, fontSize: '10px' }}>Payée</span>}
                             </td>
                           </tr>
                         ))}
@@ -1015,10 +1015,10 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
                   <td style={{ padding: '10px', fontSize: '13px', fontWeight: 600 }}>{formatMontant(f.montantTTC)}</td>
                   <td style={{ padding: '10px', fontSize: '13px' }}>{formatDate(f.dateEcheance)}</td>
                   <td style={{ padding: '10px', textAlign: 'center', fontSize: '11px' }}>
-                    {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#E08080', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⚠️ Retard</span>}
-                    {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#E8B66E', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>⏰ Bientôt</span>}
-                    {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>À payer</span>}
-                    {f.statut === 'payée' && <span style={{ background: '#7BB38F', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
+                    {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>⚠️ Retard</span>}
+                    {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#C9A227', border: '1.5px solid #E8B66E', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>⏰ Bientôt</span>}
+                    {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#162D49', border: '1.5px solid #162D49', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>À payer</span>}
+                    {f.statut === 'payée' && <span style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>✓ Payée</span>}
                   </td>
                   <td style={{ padding: '10px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
