@@ -172,8 +172,10 @@ export default function ABPaiements() {
     return d >= new Date() && d <= limite;
   };
 
-  const totalAPayer = facturesFiltrées.filter(f => f.statut === 'à payer').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+  const totalAPayer = facturesFiltrées.filter(f => f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
   const totalEnRetard = facturesFiltrées.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+  const totalPayees = facturesFiltrées.filter(f => f.statut === 'payée').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+  const totalGlobal = totalAPayer + totalEnRetard + totalPayees;
   const factureBientot = sortByEcheance(facturesFiltrées.filter(f => estEcheanceProche(f.dateEcheance, f.statut)));
 
   if (loading) {
@@ -317,17 +319,18 @@ export default function ABPaiements() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '30px' }}>
               <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(224,128,128,.15)" color="#E08080" />
               <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
+              {fournisseurFiltre && <StatCard titre="Total global" montant={formatMontant(totalGlobal)} bg="rgba(22,45,73,.10)" color="#162D49" />}
             </div>
 
             {/* À PAYER PAR MOIS */}
             {(() => {
-              const apayerByMonth = groupFacturesByMonth(facturesFiltrées.filter(f => f.statut === 'à payer'));
+              const apayerByMonth = groupFacturesByMonth(facturesFiltrées.filter(f => f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut)));
               const sortedMonths = Object.keys(apayerByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
                   <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
                     <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📌 À payer par mois</b>
-                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Ventilation par mois d'échéance</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Factures en attente (non en retard)</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
@@ -392,6 +395,45 @@ export default function ABPaiements() {
                   <div style={{ background: 'rgba(224,128,128,.08)', padding: '16px 18px', borderTop: '2px solid #E08080', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: 700, fontSize: '14px', color: '#162D49' }}>TOTAL EN RETARD</span>
                     <span style={{ fontWeight: 700, fontSize: '18px', color: '#E08080' }}>{formatMontant(totalEnRetard)}</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* PAYÉES PAR MOIS - Seulement quand on filtre par fournisseur */}
+            {fournisseurFiltre && (() => {
+              const payeesByMonth = groupFacturesByMonth(facturesFiltrées.filter(f => f.statut === 'payée'));
+              const sortedMonths = Object.keys(payeesByMonth).sort();
+              return sortedMonths.length > 0 && (
+                <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
+                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #7BB38F' }}>
+                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>✓ Payées par mois</b>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Historique des factures payées</span>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                      <thead>
+                        <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #7BB38F' }}>
+                          <th style={{ padding: '14px 18px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Mois</th>
+                          <th style={{ padding: '14px 18px', textAlign: 'right', fontWeight: 700, color: '#162D49' }}>Montant</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedMonths.map((month, i) => {
+                          const total = payeesByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
+                          return (
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : 'rgba(123,179,143,.06)', borderBottom: '1px solid #e8e8e8' }}>
+                              <td style={{ padding: '12px 18px', fontSize: '13px', color: '#162D49', fontWeight: 500 }}>{getMonthLabel(month)}</td>
+                              <td style={{ padding: '12px 18px', textAlign: 'right', fontWeight: 700, color: '#7BB38F', fontSize: '14px' }}>{formatMontant(total)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ background: 'rgba(123,179,143,.08)', padding: '16px 18px', borderTop: '2px solid #7BB38F', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#162D49' }}>TOTAL PAYÉ</span>
+                    <span style={{ fontWeight: 700, fontSize: '18px', color: '#7BB38F' }}>{formatMontant(totalPayees)}</span>
                   </div>
                 </div>
               );
