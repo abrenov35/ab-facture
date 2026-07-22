@@ -663,8 +663,8 @@ function ABPaiements() {
             <b style={{ fontSize: '18px', marginBottom: '20px', display: 'block', color: '#162D49', fontWeight: 700 }}>📊 Tableau de bord</b>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '30px' }}>
-              <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(224,128,128,.15)" color="#E08080" />
-              <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
+              <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(123,179,143,.15)" color="#7BB38F" />
+              <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(224,128,128,.15)" color="#E08080" />
               {fournisseurFiltre && <StatCard titre="Total global" montant={formatMontant(totalGlobal)} bg="rgba(22,45,73,.10)" color="#162D49" />}
             </div>
 
@@ -681,11 +681,11 @@ function ABPaiements() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
                       <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>À PAYER</small>
-                      <b style={{ fontSize: '16px', color: '#E08080' }}>{formatMontant(facturesFiltreesPeriode.filter(f => f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                      <b style={{ fontSize: '16px', color: '#7BB38F' }}>{formatMontant(facturesFiltreesPeriode.filter(f => f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
                     </div>
                     <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
                       <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>EN RETARD</small>
-                      <b style={{ fontSize: '16px', color: '#E8B66E' }}>{formatMontant(facturesFiltreesPeriode.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                      <b style={{ fontSize: '16px', color: '#E08080' }}>{formatMontant(facturesFiltreesPeriode.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
                     </div>
                     <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
                       <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>PAYÉES</small>
@@ -742,14 +742,14 @@ function ABPaiements() {
               const sortedMonths = Object.keys(apayerByMonth).sort();
               return sortedMonths.length > 0 && (
                 <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
-                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A', display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                  <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #7BB38F', display: 'flex', alignItems: 'baseline', gap: '10px' }}>
                     <b style={{ fontSize: '15px', color: '#fff', whiteSpace: 'nowrap' }}>📌 À payer par mois</b>
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)', whiteSpace: 'nowrap' }}>· Factures en attente (non en retard)</span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                       <thead>
-                        <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #D4B76A' }}>
+                        <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #7BB38F' }}>
                           <th style={{ padding: '14px 18px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Mois</th>
                           <th style={{ padding: '14px 18px', textAlign: 'right', fontWeight: 700, color: '#162D49' }}>Montant</th>
                         </tr>
@@ -758,18 +758,18 @@ function ABPaiements() {
                         {sortedMonths.map((month, i) => {
                           const total = apayerByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
                           return (
-                            <tr key={month} style={{ background: i % 2 ? '#fff' : 'rgba(212,183,106,.08)', borderBottom: '1px solid #e8e8e8' }}>
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : 'rgba(123,179,143,.08)', borderBottom: '1px solid #e8e8e8' }}>
                               <td style={{ padding: '12px 18px', fontSize: '13px', color: '#162D49', fontWeight: 500 }}>{getMonthLabel(month)}</td>
-                              <td style={{ padding: '12px 18px', textAlign: 'right', fontWeight: 700, color: '#D4B76A', fontSize: '14px' }}>{formatMontant(total)}</td>
+                              <td style={{ padding: '12px 18px', textAlign: 'right', fontWeight: 700, color: '#7BB38F', fontSize: '14px' }}>{formatMontant(total)}</td>
                             </tr>
                           );
                         })}
                       </tbody>
                     </table>
                   </div>
-                  <div style={{ background: 'rgba(212,183,106,.10)', padding: '16px 18px', borderTop: '2px solid #D4B76A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ background: 'rgba(123,179,143,.10)', padding: '16px 18px', borderTop: '2px solid #7BB38F', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: 700, fontSize: '14px', color: '#162D49' }}>TOTAL À PAYER</span>
-                    <span style={{ fontWeight: 700, fontSize: '18px', color: '#D4B76A' }}>{formatMontant(totalAPayer)}</span>
+                    <span style={{ fontWeight: 700, fontSize: '18px', color: '#7BB38F' }}>{formatMontant(totalAPayer)}</span>
                   </div>
                 </div>
               );
