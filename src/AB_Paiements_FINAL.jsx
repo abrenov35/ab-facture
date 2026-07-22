@@ -691,9 +691,9 @@ function ABPaiements() {
                       <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>PAYÉES</small>
                       <b style={{ fontSize: '16px', color: '#7BB38F' }}>{formatMontant(facturesFiltreesPeriode.filter(f => f.statut === 'payée').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
                     </div>
-                    <div style={{ background: '#D4B76A', padding: '12px', borderRadius: '8px', border: '2px solid #D4B76A' }}>
-                      <small style={{ display: 'block', color: 'rgba(22,45,73,.7)', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>TOTAL</small>
-                      <b style={{ fontSize: '16px', color: '#162D49' }}>{formatMontant(facturesFiltreesPeriode.reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                    <div style={{ background: '#162D49', padding: '12px', borderRadius: '8px', border: '2px solid #162D49' }}>
+                      <small style={{ display: 'block', color: 'rgba(255,255,255,.7)', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>TOTAL</small>
+                      <b style={{ fontSize: '16px', color: '#fff' }}>{formatMontant(facturesFiltreesPeriode.reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
                     </div>
                   </div>
                 </div>
