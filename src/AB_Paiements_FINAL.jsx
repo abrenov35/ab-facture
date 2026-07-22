@@ -279,9 +279,9 @@ export default function ABPaiements() {
         {/* TABLEAU DE BORD */}
         {activeTab === 'dashboard' && (
           <div>
-            <b style={{ fontSize: '14.5px', marginBottom: '12px', display: 'block' }}>Tableau de bord</b>
+            <b style={{ fontSize: '18px', marginBottom: '20px', display: 'block', color: '#162D49', fontWeight: 700 }}>📊 Tableau de bord</b>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '9px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '30px' }}>
               <StatCard titre="À payer" montant={formatMontant(totalAPayer)} bg="rgba(224,128,128,.15)" color="#E08080" />
               <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
             </div>
@@ -291,32 +291,35 @@ export default function ABPaiements() {
               const apayerByMonth = groupFacturesByMonth(factures.filter(f => f.statut === 'à payer'));
               const sortedMonths = Object.keys(apayerByMonth).sort();
               return sortedMonths.length > 0 && (
-                <div style={{ marginBottom: '25px' }}>
-                  <b style={{ fontSize: '13px', marginBottom: '10px', display: 'block', color: '#162D49' }}>📌 À payer par mois</b>
+                <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '1px solid #e8e8e8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #E08080 0%, #E8B66E 100%)', padding: '16px 20px', borderBottom: '3px solid #E08080' }}>
+                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📌 À payer par mois</b>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.85)' }}>Ventilation par mois d'échéance</span>
+                  </div>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                       <thead>
-                        <tr style={{ background: '#f5f5f5' }}>
-                          <th style={{ padding: '8px', textAlign: 'left' }}>Mois</th>
-                          <th style={{ padding: '8px', textAlign: 'right' }}>Montant</th>
+                        <tr style={{ background: 'rgba(224,128,128,.08)', borderBottom: '2px solid #E08080' }}>
+                          <th style={{ padding: '14px 18px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Mois</th>
+                          <th style={{ padding: '14px 18px', textAlign: 'right', fontWeight: 700, color: '#162D49' }}>Montant</th>
                         </tr>
                       </thead>
                       <tbody>
                         {sortedMonths.map((month, i) => {
                           const total = apayerByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
                           return (
-                            <tr key={month} style={{ background: i % 2 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
-                              <td style={{ padding: '8px' }}>{getMonthLabel(month)}</td>
-                              <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>{formatMontant(total)}</td>
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : 'rgba(224,128,128,.04)', borderBottom: '1px solid #eee', transition: 'background 0.2s' }}>
+                              <td style={{ padding: '12px 18px', fontSize: '13px', color: '#162D49', fontWeight: 500 }}>{getMonthLabel(month)}</td>
+                              <td style={{ padding: '12px 18px', textAlign: 'right', fontWeight: 700, color: '#E08080', fontSize: '14px' }}>{formatMontant(total)}</td>
                             </tr>
                           );
                         })}
-                        <tr style={{ background: '#f5f5f5', fontWeight: 700 }}>
-                          <td style={{ padding: '8px' }}>TOTAL À PAYER</td>
-                          <td style={{ padding: '8px', textAlign: 'right', color: '#E08080' }}>{formatMontant(totalAPayer)}</td>
-                        </tr>
                       </tbody>
                     </table>
+                  </div>
+                  <div style={{ background: 'rgba(224,128,128,.12)', padding: '16px 18px', borderTop: '2px solid #E08080', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#162D49' }}>TOTAL À PAYER</span>
+                    <span style={{ fontWeight: 700, fontSize: '18px', color: '#E08080' }}>{formatMontant(totalAPayer)}</span>
                   </div>
                 </div>
               );
@@ -327,45 +330,65 @@ export default function ABPaiements() {
               const enRetardByMonth = groupFacturesByMonth(factures.filter(f => estEnRetard(f.dateEcheance, f.statut)));
               const sortedMonths = Object.keys(enRetardByMonth).sort();
               return sortedMonths.length > 0 && (
-                <div style={{ marginBottom: '25px' }}>
-                  <b style={{ fontSize: '13px', marginBottom: '10px', display: 'block', color: '#162D49' }}>⚠️ En retard par mois</b>
+                <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '1px solid #e8e8e8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #E8B66E 0%, #D4B76A 100%)', padding: '16px 20px', borderBottom: '3px solid #E8B66E' }}>
+                    <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>⚠️ En retard par mois</b>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.85)' }}>Factures dépassant leur date d'échéance</span>
+                  </div>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                       <thead>
-                        <tr style={{ background: '#f5f5f5' }}>
-                          <th style={{ padding: '8px', textAlign: 'left' }}>Mois</th>
-                          <th style={{ padding: '8px', textAlign: 'right' }}>Montant</th>
+                        <tr style={{ background: 'rgba(232,182,110,.08)', borderBottom: '2px solid #E8B66E' }}>
+                          <th style={{ padding: '14px 18px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Mois</th>
+                          <th style={{ padding: '14px 18px', textAlign: 'right', fontWeight: 700, color: '#162D49' }}>Montant</th>
                         </tr>
                       </thead>
                       <tbody>
                         {sortedMonths.map((month, i) => {
                           const total = enRetardByMonth[month].reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0);
                           return (
-                            <tr key={month} style={{ background: i % 2 ? '#fff' : '#fafafa', borderBottom: '1px solid #eee' }}>
-                              <td style={{ padding: '8px' }}>{getMonthLabel(month)}</td>
-                              <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>{formatMontant(total)}</td>
+                            <tr key={month} style={{ background: i % 2 ? '#fff' : 'rgba(232,182,110,.04)', borderBottom: '1px solid #eee', transition: 'background 0.2s' }}>
+                              <td style={{ padding: '12px 18px', fontSize: '13px', color: '#162D49', fontWeight: 500 }}>{getMonthLabel(month)}</td>
+                              <td style={{ padding: '12px 18px', textAlign: 'right', fontWeight: 700, color: '#E8B66E', fontSize: '14px' }}>{formatMontant(total)}</td>
                             </tr>
                           );
                         })}
-                        <tr style={{ background: '#f5f5f5', fontWeight: 700 }}>
-                          <td style={{ padding: '8px' }}>TOTAL EN RETARD</td>
-                          <td style={{ padding: '8px', textAlign: 'right', color: '#E8B66E' }}>{formatMontant(totalEnRetard)}</td>
-                        </tr>
                       </tbody>
                     </table>
+                  </div>
+                  <div style={{ background: 'rgba(232,182,110,.12)', padding: '16px 18px', borderTop: '2px solid #E8B66E', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#162D49' }}>TOTAL EN RETARD</span>
+                    <span style={{ fontWeight: 700, fontSize: '18px', color: '#E8B66E' }}>{formatMontant(totalEnRetard)}</span>
                   </div>
                 </div>
               );
             })()}
 
             {factureBientot.length > 0 && (
-              <div style={{ background: 'rgba(212,183,106,.15)', border: '1px solid rgba(212,183,106,.3)', borderRadius: '10px', padding: '12px 15px', marginBottom: '20px' }}>
-                <b style={{ fontSize: '13px', display: 'block', marginBottom: '8px' }}>📅 Échéances proches ({factureBientot.length})</b>
-                {factureBientot.map(f => (
-                  <div key={f.id} style={{ fontSize: '12px', paddingBottom: '6px' }}>
-                    {f.fournisseur} - {formatMontant(f.montantTTC)} - {formatDate(f.dateEcheance)}
-                  </div>
-                ))}
+              <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e8e8e8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.06)', marginBottom: '20px' }}>
+                <div style={{ background: 'linear-gradient(135deg, #D4B76A 0%, #B8A055 100%)', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
+                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Échéances proches</b>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.85)' }}>{factureBientot.length} facture{factureBientot.length > 1 ? 's' : ''} dans les 7 prochains jours</span>
+                </div>
+                <div style={{ padding: '12px 0' }}>
+                  {factureBientot.map((f, i) => (
+                    <div key={f.id} style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      padding: '12px 20px', 
+                      borderBottom: i < factureBientot.length - 1 ? '1px solid #f0f0f0' : 'none',
+                      background: i % 2 ? '#fff' : 'rgba(212,183,106,.04)',
+                      fontSize: '13px'
+                    }}>
+                      <span style={{ color: '#162D49', fontWeight: 500 }}>{f.fournisseur}</span>
+                      <span style={{ color: '#666', textAlign: 'right' }}>
+                        <b style={{ color: '#D4B76A', display: 'block' }}>{formatMontant(f.montantTTC)}</b>
+                        <small>{formatDate(f.dateEcheance)}</small>
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -429,9 +452,17 @@ export default function ABPaiements() {
 
 function StatCard({ titre, montant, bg, color }) {
   return (
-    <div style={{ background: '#fff', borderLeft: `4px solid ${color}`, borderRadius: '8px', padding: '12px 15px', boxShadow: '0 1px 4px rgba(22,45,73,.10)' }}>
-      <small style={{ display: 'block', color: '#888', fontSize: '11px', textTransform: 'uppercase', marginBottom: '6px' }}>{titre}</small>
-      <b style={{ fontSize: '18px', color: color }}>{montant}</b>
+    <div style={{ 
+      background: '#fff', 
+      borderLeft: `5px solid ${color}`, 
+      borderRadius: '10px', 
+      padding: '16px 18px', 
+      boxShadow: '0 2px 8px rgba(22,45,73,.08)',
+      transition: 'transform 0.2s, box-shadow 0.2s',
+      cursor: 'default'
+    }}>
+      <small style={{ display: 'block', color: '#999', fontSize: '11px', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 700, letterSpacing: '0.5px' }}>{titre}</small>
+      <b style={{ fontSize: '24px', color: color, display: 'block', fontWeight: 700 }}>{montant}</b>
     </div>
   );
 }
