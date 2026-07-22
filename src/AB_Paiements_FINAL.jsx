@@ -1023,7 +1023,7 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
                   <td style={{ padding: '10px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
                       {onPayer && f.statut === 'à payer' && (
-                        <button onClick={() => onPayer(f)} style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>✓ Payer</button>
+                        <button onClick={() => onPayer(f)} style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>Payer</button>
                       )}
                       <button onClick={() => onEdit(f)} title="Modifier" style={{ background: '#fff', color: '#C9A227', border: '1.5px solid #D4B76A', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
                       <button onClick={() => onDelete(f.id)} title="Supprimer" style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🗑️</button>
