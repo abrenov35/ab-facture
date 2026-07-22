@@ -108,48 +108,66 @@ function ABPaiements() {
 
     const facturesLiees = factures.filter(f => f.fournisseur === fournisseur.nom);
 
-    let message = `Supprimer le fournisseur "${fournisseur.nom}" ?`;
-    if (facturesLiees.length > 0) {
-      message = `Le fournisseur "${fournisseur.nom}" a ${facturesLiees.length} facture(s) associée(s). Supprimer le fournisseur ET ses factures ?`;
-    }
-
-    setConfirmModal({
-      message,
-      onConfirm: async () => {
-        setConfirmModal(null);
-        try {
-          // Supprimer les factures liées si elles existent
-          if (facturesLiees.length > 0) {
-            for (const facture of facturesLiees) {
-              await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'deleteFacture', id: facture.id })
-              });
-            }
-          }
-
-          // Supprimer le fournisseur
-          const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ 
-              action: 'deleteFournisseur',
-              id: id
-            })
-          });
-          const data = await response.json();
-          if (data.success) {
-            setFournisseurs(fournisseurs.filter(f => f.id !== id));
-            if (facturesLiees.length > 0) {
-              const facturesLieesIds = facturesLiees.map(f => f.id);
-              setFactures(factures.filter(f => !facturesLieesIds.includes(f.id)));
-            }
-          }
-        } catch (error) {
-          console.error('Erreur:', error);
-          alert('Erreur lors de la suppression');
+    // Supprime uniquement le fournisseur (garde les factures)
+    const supprimerFournisseurSeul = async () => {
+      setConfirmModal(null);
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'deleteFournisseur', id: id })
+        });
+        const data = await response.json();
+        if (data.success) {
+          setFournisseurs(fournisseurs.filter(f => f.id !== id));
         }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
       }
-    });
+    };
+
+    // Supprime le fournisseur ET ses factures
+    const supprimerFournisseurEtFactures = async () => {
+      setConfirmModal(null);
+      try {
+        for (const facture of facturesLiees) {
+          await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'deleteFacture', id: facture.id })
+          });
+        }
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'deleteFournisseur', id: id })
+        });
+        const data = await response.json();
+        if (data.success) {
+          setFournisseurs(fournisseurs.filter(f => f.id !== id));
+          const facturesLieesIds = facturesLiees.map(f => f.id);
+          setFactures(factures.filter(f => !facturesLieesIds.includes(f.id)));
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
+      }
+    };
+
+    if (facturesLiees.length === 0) {
+      setConfirmModal({
+        message: `Supprimer le fournisseur "${fournisseur.nom}" ?`,
+        actions: [
+          { label: 'Supprimer', color: '#E08080', textColor: '#fff', onClick: supprimerFournisseurSeul }
+        ]
+      });
+    } else {
+      setConfirmModal({
+        message: `Le fournisseur "${fournisseur.nom}" a ${facturesLiees.length} facture(s) associée(s). Que voulez-vous faire ?`,
+        actions: [
+          { label: `Supprimer le fournisseur ET ses ${facturesLiees.length} facture(s)`, color: '#E08080', textColor: '#fff', onClick: supprimerFournisseurEtFactures },
+          { label: 'Supprimer le fournisseur seulement (garder les factures)', color: '#fff', textColor: '#162D49', border: '1.5px solid #D4B76A', onClick: supprimerFournisseurSeul }
+        ]
+      });
+    }
   };
 
   const handleChangeTab = (tabId) => {
@@ -578,12 +596,17 @@ function ABPaiements() {
               textAlign: 'center'
             }}>
               <p style={{ fontSize: '15px', fontWeight: 600, color: '#162D49', marginBottom: '20px', lineHeight: 1.4 }}>{confirmModal.message}</p>
-              <button
-                onClick={confirmModal.onConfirm}
-                style={{ width: '100%', background: '#E08080', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '14.5px', fontWeight: 700, cursor: 'pointer', marginBottom: '10px' }}
-              >
-                Supprimer
-              </button>
+              {(confirmModal.actions || [
+                { label: 'Supprimer', color: '#E08080', textColor: '#fff', onClick: confirmModal.onConfirm }
+              ]).map((action, i) => (
+                <button
+                  key={i}
+                  onClick={action.onClick}
+                  style={{ width: '100%', background: action.color, color: action.textColor, border: action.border || 'none', borderRadius: '8px', padding: '12px', fontSize: '14.5px', fontWeight: 700, cursor: 'pointer', marginBottom: '10px' }}
+                >
+                  {action.label}
+                </button>
+              ))}
               <button
                 onClick={() => setConfirmModal(null)}
                 style={{ width: '100%', background: '#fff', color: '#162D49', border: '1px solid rgba(22,45,73,.2)', borderRadius: '8px', padding: '12px', fontSize: '14.5px', fontWeight: 600, cursor: 'pointer' }}
