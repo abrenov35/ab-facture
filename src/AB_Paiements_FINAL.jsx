@@ -1168,7 +1168,7 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
             <tr style={{ background: '#162D49', color: '#fff' }}>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Fournisseur</th>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Type / Métier</th>
-              <th style={{ padding: '12px', textAlign: 'center', fontSize: '13px', fontWeight: 600 }}>Actions</th>
+              <th style={{ padding: '12px', textAlign: 'right', fontSize: '13px', fontWeight: 600 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -1176,10 +1176,10 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
               <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
                 <td style={{ padding: '12px', fontSize: '13px', fontWeight: 600, color: '#162D49' }}>{f.nom}</td>
                 <td style={{ padding: '12px', fontSize: '13px', color: '#666' }}>{f.type || '-'}</td>
-                <td style={{ padding: '12px', textAlign: 'center' }}>
+                <td style={{ padding: '12px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                   <button
                     onClick={() => handleEdit(f)}
-                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', marginRight: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     ✎ Modifier
                   </button>
