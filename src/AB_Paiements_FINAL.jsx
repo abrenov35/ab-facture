@@ -102,24 +102,48 @@ function ABPaiements() {
   };
 
   const handleSupprimerFournisseur = async (id) => {
-    if (window.confirm('Supprimer ce fournisseur ?')) {
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({ 
-            action: 'deleteFournisseur',
-            id: id
-          })
-        });
-        const data = await response.json();
-        if (data.success) {
-          const updated = fournisseurs.filter(f => f.id !== id);
-          setFournisseurs(updated);
+    const fournisseur = fournisseurs.find(f => f.id === id);
+    if (!fournisseur) return;
+
+    const facturesLiees = factures.filter(f => f.fournisseur === fournisseur.nom);
+
+    let message = `Supprimer le fournisseur "${fournisseur.nom}" ?`;
+    if (facturesLiees.length > 0) {
+      message = `Le fournisseur "${fournisseur.nom}" a ${facturesLiees.length} facture(s) associée(s).\n\nVoulez-vous aussi supprimer ces factures ?\n\n- OK = Supprimer le fournisseur ET ses factures\n- Annuler = Ne rien supprimer`;
+    }
+
+    if (!window.confirm(message)) return;
+
+    try {
+      // Supprimer les factures liées si elles existent
+      if (facturesLiees.length > 0) {
+        for (const facture of facturesLiees) {
+          await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'deleteFacture', id: facture.id })
+          });
         }
-      } catch (error) {
-        console.error('Erreur:', error);
-        alert('Erreur lors de la suppression');
       }
+
+      // Supprimer le fournisseur
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          action: 'deleteFournisseur',
+          id: id
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setFournisseurs(fournisseurs.filter(f => f.id !== id));
+        if (facturesLiees.length > 0) {
+          const facturesLieesIds = facturesLiees.map(f => f.id);
+          setFactures(factures.filter(f => !facturesLieesIds.includes(f.id)));
+        }
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la suppression');
     }
   };
 
