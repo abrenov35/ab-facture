@@ -32,6 +32,8 @@ export default function ABPaiements() {
   const gs = useGoogleSheets();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [fournisseurFiltre, setFournisseurFiltre] = useState('');
+  const [dateDebut, setDateDebut] = useState('');
+  const [dateFin, setDateFin] = useState('');
   const [factures, setFactures] = useState([]);
   const [fournisseurs, setFournisseurs] = useState([]);
   const [editingFacture, setEditingFacture] = useState(null);
@@ -92,6 +94,15 @@ export default function ABPaiements() {
   const facturesFiltrées = fournisseurFiltre 
     ? factures.filter(f => f.fournisseur === fournisseurFiltre)
     : factures;
+
+  const facturesFiltreesPeriode = dateDebut && dateFin
+    ? facturesFiltrées.filter(f => {
+        const dateEch = new Date(f.dateEcheance);
+        const debut = new Date(dateDebut);
+        const fin = new Date(dateFin);
+        return dateEch >= debut && dateEch <= fin;
+      })
+    : facturesFiltrées;
 
   const handlePayer = (facture) => {
     setFactureToPay(facture);
@@ -246,6 +257,65 @@ export default function ABPaiements() {
               </select>
             </div>
 
+            {/* Filtres par période */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <input
+                type="date"
+                value={dateDebut}
+                onChange={(e) => setDateDebut(e.target.value)}
+                placeholder="De"
+                title="Date début"
+                style={{
+                  background: '#fff',
+                  color: '#162D49',
+                  border: '1px solid rgba(255,255,255,.35)',
+                  borderRadius: '7px',
+                  padding: '7px 12px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              />
+              <input
+                type="date"
+                value={dateFin}
+                onChange={(e) => setDateFin(e.target.value)}
+                placeholder="À"
+                title="Date fin"
+                style={{
+                  background: '#fff',
+                  color: '#162D49',
+                  border: '1px solid rgba(255,255,255,.35)',
+                  borderRadius: '7px',
+                  padding: '7px 12px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              />
+              {(dateDebut || dateFin) && (
+                <button
+                  onClick={() => { setDateDebut(''); setDateFin(''); }}
+                  title="Réinitialiser"
+                  style={{
+                    background: 'rgba(255,255,255,.2)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,.35)',
+                    borderRadius: '7px',
+                    padding: '7px 12px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  ✕ Réinitialiser
+                </button>
+              )}
+            </div>
+
             {/* Bouton Nouvelle facture */}
             <button
               onClick={() => { setShowFormulaire(true); setEditingFacture(null); }}
@@ -321,6 +391,74 @@ export default function ABPaiements() {
               <StatCard titre="En retard" montant={formatMontant(totalEnRetard)} bg="rgba(232,182,110,.15)" color="#E8B66E" />
               {fournisseurFiltre && <StatCard titre="Total global" montant={formatMontant(totalGlobal)} bg="rgba(22,45,73,.10)" color="#162D49" />}
             </div>
+
+            {/* RÉSUMÉ DE LA PÉRIODE */}
+            {dateDebut && dateFin && (
+              <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
+                <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
+                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Résumé de la période</b>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Du {formatDate(dateDebut)} au {formatDate(dateFin)}</span>
+                </div>
+                
+                {/* Cartes résumé période */}
+                <div style={{ padding: '20px', background: '#f5f5f5' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '15px' }}>
+                    <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
+                      <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>À PAYER</small>
+                      <b style={{ fontSize: '16px', color: '#E08080' }}>{formatMontant(facturesFiltreesPeriode.filter(f => f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                    </div>
+                    <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
+                      <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>EN RETARD</small>
+                      <b style={{ fontSize: '16px', color: '#E8B66E' }}>{formatMontant(facturesFiltreesPeriode.filter(f => estEnRetard(f.dateEcheance, f.statut)).reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                    </div>
+                    <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
+                      <small style={{ display: 'block', color: '#999', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>PAYÉES</small>
+                      <b style={{ fontSize: '16px', color: '#7BB38F' }}>{formatMontant(facturesFiltreesPeriode.filter(f => f.statut === 'payée').reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                    </div>
+                    <div style={{ background: '#D4B76A', padding: '12px', borderRadius: '8px', border: '2px solid #D4B76A' }}>
+                      <small style={{ display: 'block', color: 'rgba(22,45,73,.7)', fontSize: '11px', fontWeight: 700, marginBottom: '4px' }}>TOTAL</small>
+                      <b style={{ fontSize: '16px', color: '#162D49' }}>{formatMontant(facturesFiltreesPeriode.reduce((sum, f) => sum + (parseFloat(f.montantTTC) || 0), 0))}</b>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tableau détaillé de la période */}
+                {facturesFiltreesPeriode.length > 0 && (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                      <thead>
+                        <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #D4B76A', borderTop: '1px solid #e8e8e8' }}>
+                          <th style={{ padding: '12px 15px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Fournisseur</th>
+                          <th style={{ padding: '12px 15px', textAlign: 'left', fontWeight: 700, color: '#162D49' }}>Échéance</th>
+                          <th style={{ padding: '12px 15px', textAlign: 'right', fontWeight: 700, color: '#162D49' }}>Montant</th>
+                          <th style={{ padding: '12px 15px', textAlign: 'center', fontWeight: 700, color: '#162D49' }}>Statut</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortByEcheance(facturesFiltreesPeriode).map((f, i) => (
+                          <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
+                            <td style={{ padding: '10px 15px', fontSize: '12px', color: '#162D49' }}>{f.fournisseur}</td>
+                            <td style={{ padding: '10px 15px', fontSize: '12px', color: '#666' }}>{formatDate(f.dateEcheance)}</td>
+                            <td style={{ padding: '10px 15px', textAlign: 'right', fontWeight: 600, color: '#162D49' }}>{formatMontant(f.montantTTC)}</td>
+                            <td style={{ padding: '10px 15px', textAlign: 'center', fontSize: '11px' }}>
+                              {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#E08080', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>Retard</span>}
+                              {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#162D49', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>À payer</span>}
+                              {f.statut === 'payée' && <span style={{ background: '#7BB38F', color: '#fff', padding: '2px 6px', borderRadius: '3px', fontSize: '10px' }}>Payée</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {facturesFiltreesPeriode.length === 0 && (
+                  <div style={{ padding: '20px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
+                    Aucune facture pour cette période
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* À PAYER PAR MOIS */}
             {(() => {
