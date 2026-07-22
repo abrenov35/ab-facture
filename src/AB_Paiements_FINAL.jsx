@@ -32,8 +32,7 @@ export default function ABPaiements() {
   const gs = useGoogleSheets();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [fournisseurFiltre, setFournisseurFiltre] = useState('');
-  const [dateDebut, setDateDebut] = useState('');
-  const [dateFin, setDateFin] = useState('');
+  const [anneeFiltre, setAnneeFiltre] = useState('');
   const [factures, setFactures] = useState([]);
   const [fournisseurs, setFournisseurs] = useState([]);
   const [editingFacture, setEditingFacture] = useState(null);
@@ -95,13 +94,8 @@ export default function ABPaiements() {
     ? factures.filter(f => f.fournisseur === fournisseurFiltre)
     : factures;
 
-  const facturesFiltreesPeriode = dateDebut && dateFin
-    ? facturesFiltrées.filter(f => {
-        const dateEch = new Date(f.dateEcheance);
-        const debut = new Date(dateDebut);
-        const fin = new Date(dateFin);
-        return dateEch >= debut && dateEch <= fin;
-      })
+  const facturesFiltreesPeriode = anneeFiltre
+    ? facturesFiltrées.filter(f => new Date(f.dateEcheance).getFullYear().toString() === anneeFiltre)
     : facturesFiltrées;
 
   const handlePayer = (facture) => {
@@ -257,14 +251,11 @@ export default function ABPaiements() {
               </select>
             </div>
 
-            {/* Filtres par période */}
+            {/* Dropdown filtre année */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <input
-                type="date"
-                value={dateDebut}
-                onChange={(e) => setDateDebut(e.target.value)}
-                placeholder="De"
-                title="Date début"
+              <select
+                value={anneeFiltre}
+                onChange={(e) => setAnneeFiltre(e.target.value)}
                 style={{
                   background: '#fff',
                   color: '#162D49',
@@ -276,44 +267,14 @@ export default function ABPaiements() {
                   cursor: 'pointer',
                   outline: 'none'
                 }}
-              />
-              <input
-                type="date"
-                value={dateFin}
-                onChange={(e) => setDateFin(e.target.value)}
-                placeholder="À"
-                title="Date fin"
-                style={{
-                  background: '#fff',
-                  color: '#162D49',
-                  border: '1px solid rgba(255,255,255,.35)',
-                  borderRadius: '7px',
-                  padding: '7px 12px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  outline: 'none'
-                }}
-              />
-              {(dateDebut || dateFin) && (
-                <button
-                  onClick={() => { setDateDebut(''); setDateFin(''); }}
-                  title="Réinitialiser"
-                  style={{
-                    background: 'rgba(255,255,255,.2)',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,.35)',
-                    borderRadius: '7px',
-                    padding: '7px 12px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                >
-                  ✕ Réinitialiser
-                </button>
-              )}
+              >
+                <option value="">📅 Toutes les années</option>
+                {[...new Set(factures.map(f => new Date(f.dateEcheance).getFullYear()))].sort((a, b) => b - a).map(annee => (
+                  <option key={annee} value={annee.toString()}>
+                    {annee}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Bouton Nouvelle facture */}
@@ -392,15 +353,15 @@ export default function ABPaiements() {
               {fournisseurFiltre && <StatCard titre="Total global" montant={formatMontant(totalGlobal)} bg="rgba(22,45,73,.10)" color="#162D49" />}
             </div>
 
-            {/* RÉSUMÉ DE LA PÉRIODE */}
-            {dateDebut && dateFin && (
+            {/* RÉSUMÉ DE L'ANNÉE */}
+            {anneeFiltre && (
               <div style={{ marginBottom: '30px', background: '#fff', borderRadius: '12px', border: '2px solid #162D49', overflow: 'hidden', boxShadow: '0 2px 8px rgba(22,45,73,.10)' }}>
                 <div style={{ background: '#162D49', padding: '16px 20px', borderBottom: '3px solid #D4B76A' }}>
-                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Résumé de la période</b>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>Du {formatDate(dateDebut)} au {formatDate(dateFin)}</span>
+                  <b style={{ fontSize: '15px', display: 'block', color: '#fff', marginBottom: '4px' }}>📅 Résumé de l'année {anneeFiltre}</b>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.80)' }}>{fournisseurFiltre ? `Fournisseur: ${fournisseurFiltre}` : 'Tous les fournisseurs'}</span>
                 </div>
                 
-                {/* Cartes résumé période */}
+                {/* Cartes résumé année */}
                 <div style={{ padding: '20px', background: '#f5f5f5' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div style={{ background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e8e8e8' }}>
@@ -422,7 +383,7 @@ export default function ABPaiements() {
                   </div>
                 </div>
 
-                {/* Tableau détaillé de la période */}
+                {/* Tableau détaillé de l'année */}
                 {facturesFiltreesPeriode.length > 0 && (
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
@@ -454,7 +415,7 @@ export default function ABPaiements() {
 
                 {facturesFiltreesPeriode.length === 0 && (
                   <div style={{ padding: '20px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-                    Aucune facture pour cette période
+                    Aucune facture pour cette année
                   </div>
                 )}
               </div>
