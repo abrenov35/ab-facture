@@ -29,8 +29,11 @@ function ABPaiements() {
         body: JSON.stringify({ action: 'getFactures' })
       });
       const facData = await facResponse.json();
-      if (facData.success) {
-        setFactures(facData.data);
+      if (facData.success && Array.isArray(facData.data)) {
+        setFactures(facData.data || []);
+      } else {
+        console.error('Données factures invalides:', facData);
+        setFactures([]);
       }
       
       // Charger les fournisseurs depuis Google Sheets
@@ -39,11 +42,16 @@ function ABPaiements() {
         body: JSON.stringify({ action: 'getFournisseurs' })
       });
       const fournData = await fournResponse.json();
-      if (fournData.success) {
-        setFournisseurs(fournData.data);
+      if (fournData.success && Array.isArray(fournData.data)) {
+        setFournisseurs(fournData.data || []);
+      } else {
+        console.error('Données fournisseurs invalides:', fournData);
+        setFournisseurs([]);
       }
     } catch (error) {
       console.error('Erreur lors du chargement:', error);
+      setFactures([]);
+      setFournisseurs([]);
       alert('Erreur de connexion à Google Sheets');
     } finally {
       setLoading(false);
@@ -125,10 +133,17 @@ function ABPaiements() {
     ? factures.filter(f => f.fournisseur === fournisseurFiltre)
     : factures;
 
-  const facturesFiltreesPeriode = anneeFiltre
+  const facturesFiltreesPeriode = anneeFiltre && factures && factures.length > 0
     ? facturesFiltrées.filter(f => {
-        const d = parseDate(f.dateEcheance);
-        return d ? d.getFullYear().toString() === anneeFiltre : false;
+        try {
+          if (!f || !f.dateEcheance) return false;
+          const d = parseDate(f.dateEcheance);
+          if (!d || isNaN(d.getTime())) return false;
+          return d.getFullYear().toString() === anneeFiltre;
+        } catch (e) {
+          console.error('Erreur parsing date:', f.dateEcheance, e);
+          return false;
+        }
       })
     : facturesFiltrées;
 
@@ -464,14 +479,19 @@ function ABPaiements() {
                 }}
               >
                 <option value="">📅 Toutes les années</option>
-                {[...new Set(factures.map(f => {
-                  const d = parseDate(f.dateEcheance);
-                  return d ? d.getFullYear() : null;
+                {(factures && Array.isArray(factures)) ? [...new Set(factures.map(f => {
+                  try {
+                    if (!f || !f.dateEcheance) return null;
+                    const d = parseDate(f.dateEcheance);
+                    return d && !isNaN(d.getTime()) ? d.getFullYear() : null;
+                  } catch (e) {
+                    return null;
+                  }
                 }).filter(y => y))].sort((a, b) => b - a).map(annee => (
                   <option key={annee} value={annee.toString()}>
                     {annee}
                   </option>
-                ))}
+                )) : null}
               </select>
             </div>
 
