@@ -998,11 +998,13 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
                     {f.statut === 'payée' && <span style={{ background: '#7BB38F', color: '#fff', padding: '3px 8px', borderRadius: '4px' }}>✓ Payée</span>}
                   </td>
                   <td style={{ padding: '10px', textAlign: 'center' }}>
-                    {onPayer && f.statut === 'à payer' && (
-                      <button onClick={() => onPayer(f)} style={{ background: '#7BB38F', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px', fontWeight: 600 }}>✓ Payer</button>
-                    )}
-                    <button onClick={() => onEdit(f)} style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginRight: '4px', fontSize: '12px' }}>✎</button>
-                    <button onClick={() => onDelete(f.id)} style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                      {onPayer && f.statut === 'à payer' && (
+                        <button onClick={() => onPayer(f)} style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>✓ Payer</button>
+                      )}
+                      <button onClick={() => onEdit(f)} style={{ background: '#fff', color: '#C9A227', border: '1.5px solid #D4B76A', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>✎ Modifier</button>
+                      <button onClick={() => onDelete(f.id)} style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>🗑️ Supprimer</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -1432,20 +1434,20 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
               <tr key={f.id} style={{ background: i % 2 ? '#fff' : '#FAF9F6', borderBottom: '1px solid rgba(22,45,73,.10)' }}>
                 <td style={{ padding: '12px', fontSize: '13px', fontWeight: 600, color: '#162D49' }}>{f.nom}</td>
                 <td style={{ padding: '12px', fontSize: '13px', color: '#666' }}>{f.type || '-'}</td>
-                <td style={{ padding: '12px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <td style={{ padding: '12px', display: 'flex', justifyContent: 'flex-end', gap: '6px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => handleEdit(f)}
                     title="Modifier"
-                    style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}
+                    style={{ background: '#fff', color: '#C9A227', border: '1.5px solid #D4B76A', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}
                   >
-                    ✎
+                    ✎ Modifier
                   </button>
                   <button
                     onClick={() => onSupprimer(f.id)}
                     title="Supprimer"
-                    style={{ background: '#E08080', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}
+                    style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', borderRadius: '20px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}
                   >
-                    🗑️
+                    🗑️ Supprimer
                   </button>
                 </td>
               </tr>
