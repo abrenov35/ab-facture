@@ -153,6 +153,98 @@ function ABPaiements() {
     setEditingFacture(null);
   };
 
+  const parseDate = (dateInput) => {
+    if (!dateInput || dateInput === '' || dateInput === 'Invalid Date') return null;
+    
+    // Si c'est déjà une Date
+    if (dateInput instanceof Date && !isNaN(dateInput.getTime())) return dateInput;
+    
+    // Convertir en string et trim
+    let dateStr = String(dateInput).trim();
+    if (!dateStr) return null;
+    
+    // Si c'est un nombre (Excel/Google Sheets serial date)
+    if (!isNaN(dateStr) && dateStr !== '') {
+      try {
+        const num = parseFloat(dateStr);
+        // Nombre positif > 60000 = probablement un Excel serial
+        if (num > 60000) {
+          const date = new Date((num - 25569) * 86400 * 1000);
+          if (!isNaN(date.getTime())) return date;
+        }
+      } catch (e) {}
+    }
+    
+    // Format ISO (YYYY-MM-DD ou YYYY-MM-DDTHH:mm:ss)
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+      try {
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) return date;
+      } catch (e) {}
+    }
+    
+    // Format DD/MM/YYYY ou DD-MM-YYYY
+    if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
+      try {
+        const parts = dateStr.split(/[/-]/);
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const year = parseInt(parts[2]);
+        if (day > 0 && day <= 31 && month > 0 && month <= 12) {
+          const date = new Date(year, month - 1, day);
+          if (!isNaN(date.getTime())) return date;
+        }
+      } catch (e) {}
+    }
+    
+    // Format MM/DD/YYYY (US)
+    if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
+      try {
+        const parts = dateStr.split(/[/-]/);
+        const first = parseInt(parts[0]);
+        const second = parseInt(parts[1]);
+        const year = parseInt(parts[2]);
+        
+        // Si premier nombre > 12, c'est DD/MM
+        if (first > 12) {
+          const date = new Date(year, second - 1, first);
+          if (!isNaN(date.getTime())) return date;
+        } else if (second > 12) {
+          // Sinon c'est MM/DD
+          const date = new Date(year, first - 1, second);
+          if (!isNaN(date.getTime())) return date;
+        }
+      } catch (e) {}
+    }
+    
+    // Essayer le parsing standard de JavaScript
+    try {
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) return d;
+    } catch (e) {}
+    
+    return null;
+  };
+
+  // Fonction pour convertir une date au format YYYY-MM-DD
+  const toISODate = (dateInput) => {
+    if (!dateInput || dateInput === '') return '';
+    
+    // Si c'est déjà au format YYYY-MM-DD, retourner tel quel
+    if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateInput;
+    }
+    
+    const d = parseDate(dateInput);
+    if (!d || isNaN(d.getTime())) return '';
+    
+    try {
+      return d.toISOString().split('T')[0];
+    } catch (e) {
+      return '';
+    }
+  };
+
   const facturesFiltrées = fournisseurFiltre 
     ? factures.filter(f => f.fournisseur === fournisseurFiltre)
     : factures;
@@ -258,98 +350,6 @@ function ABPaiements() {
         alert('Erreur lors de la suppression');
       }
     }
-  };
-
-  // Fonction pour convertir une date au format YYYY-MM-DD
-  const toISODate = (dateInput) => {
-    if (!dateInput || dateInput === '') return '';
-    
-    // Si c'est déjà au format YYYY-MM-DD, retourner tel quel
-    if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return dateInput;
-    }
-    
-    const d = parseDate(dateInput);
-    if (!d || isNaN(d.getTime())) return '';
-    
-    try {
-      return d.toISOString().split('T')[0];
-    } catch (e) {
-      return '';
-    }
-  };
-
-  const parseDate = (dateInput) => {
-    if (!dateInput || dateInput === '' || dateInput === 'Invalid Date') return null;
-    
-    // Si c'est déjà une Date
-    if (dateInput instanceof Date && !isNaN(dateInput.getTime())) return dateInput;
-    
-    // Convertir en string et trim
-    let dateStr = String(dateInput).trim();
-    if (!dateStr) return null;
-    
-    // Si c'est un nombre (Excel/Google Sheets serial date)
-    if (!isNaN(dateStr) && dateStr !== '') {
-      try {
-        const num = parseFloat(dateStr);
-        // Nombre positif > 60000 = probablement un Excel serial
-        if (num > 60000) {
-          const date = new Date((num - 25569) * 86400 * 1000);
-          if (!isNaN(date.getTime())) return date;
-        }
-      } catch (e) {}
-    }
-    
-    // Format ISO (YYYY-MM-DD ou YYYY-MM-DDTHH:mm:ss)
-    if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
-      try {
-        const date = new Date(dateStr);
-        if (!isNaN(date.getTime())) return date;
-      } catch (e) {}
-    }
-    
-    // Format DD/MM/YYYY ou DD-MM-YYYY
-    if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
-      try {
-        const parts = dateStr.split(/[/-]/);
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]);
-        const year = parseInt(parts[2]);
-        if (day > 0 && day <= 31 && month > 0 && month <= 12) {
-          const date = new Date(year, month - 1, day);
-          if (!isNaN(date.getTime())) return date;
-        }
-      } catch (e) {}
-    }
-    
-    // Format MM/DD/YYYY (US)
-    if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
-      try {
-        const parts = dateStr.split(/[/-]/);
-        const first = parseInt(parts[0]);
-        const second = parseInt(parts[1]);
-        const year = parseInt(parts[2]);
-        
-        // Si premier nombre > 12, c'est DD/MM
-        if (first > 12) {
-          const date = new Date(year, second - 1, first);
-          if (!isNaN(date.getTime())) return date;
-        } else if (second > 12) {
-          // Sinon c'est MM/DD
-          const date = new Date(year, first - 1, second);
-          if (!isNaN(date.getTime())) return date;
-        }
-      } catch (e) {}
-    }
-    
-    // Essayer le parsing standard de JavaScript
-    try {
-      const d = new Date(dateStr);
-      if (!isNaN(d.getTime())) return d;
-    } catch (e) {}
-    
-    return null;
   };
 
   const formatDate = (dateInput) => {
