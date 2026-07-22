@@ -1293,14 +1293,8 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <div style={{ marginBottom: '12px' }}>
         <b style={{ fontSize: '14.5px' }}>Fournisseurs / Sous-traitants</b>
-        <button
-          onClick={() => setShowForm(true)}
-          style={{ background: '#162D49', color: '#fff', border: 'none', borderRadius: '7px', padding: '10px 16px', fontSize: '13.5px', fontWeight: 600, cursor: 'pointer' }}
-        >
-          ➕ Ajouter
-        </button>
       </div>
 
       {showForm && (
@@ -1374,7 +1368,14 @@ function GestionFournisseurs({ fournisseurs, onAjouter, onModifier, onSupprimer,
             <tr style={{ background: '#162D49', color: '#fff' }}>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Fournisseur</th>
               <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', fontWeight: 600 }}>Type / Métier</th>
-              <th style={{ padding: '12px', textAlign: 'right', fontSize: '13px', fontWeight: 600 }}></th>
+              <th style={{ padding: '10px 12px', textAlign: 'right' }}>
+                <button
+                  onClick={() => setShowForm(true)}
+                  style={{ background: '#D4B76A', color: '#162D49', border: 'none', borderRadius: '7px', padding: '7px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  ➕ Ajouter
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
