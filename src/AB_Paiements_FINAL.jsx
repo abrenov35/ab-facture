@@ -1018,7 +1018,7 @@ function TableFactures({ factures, onEdit, onDelete, onPayer, estEnRetard, estEc
                     {estEnRetard(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#E08080', border: '1.5px solid #E08080', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>Retard</span>}
                     {estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#C9A227', border: '1.5px solid #E8B66E', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>Bientôt</span>}
                     {f.statut === 'à payer' && !estEnRetard(f.dateEcheance, f.statut) && !estEcheanceProche(f.dateEcheance, f.statut) && <span style={{ background: '#fff', color: '#162D49', border: '1.5px solid #162D49', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>À payer</span>}
-                    {f.statut === 'payée' && <span style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>✓ Payée</span>}
+                    {f.statut === 'payée' && <span style={{ background: '#fff', color: '#7BB38F', border: '1.5px solid #7BB38F', padding: '4px 10px', borderRadius: '20px', fontWeight: 700 }}>Payée</span>}
                   </td>
                   <td style={{ padding: '10px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
