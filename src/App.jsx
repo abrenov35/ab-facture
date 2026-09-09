@@ -83,7 +83,7 @@ export default function App() {
             const montantAffiche = new Intl.NumberFormat('fr-FR', {
               style: 'currency',
               currency: 'EUR'
-            }).format(Number(facture.montantTTC));
+            }).format(montant / 100);
 
             const continuer = window.confirm(
               '⚠️ FACTURE DÉJÀ EXISTANTE\n\n' +
